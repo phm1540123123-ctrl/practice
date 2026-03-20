@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os, csv
 from collections import defaultdict
+import folium
+from streamlit_folium import st_folium
 
 st.set_page_config(
     page_title="한강 수질 분석 · 2020–2050",
@@ -152,6 +154,179 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
+# ── 지도용 상수 ───────────────────────────────────────────────────────────────
+STATIONS = {
+    "노량진": {"lat": 37.5110, "lon": 126.9333},
+    "선유":   {"lat": 37.5330, "lon": 126.8780},
+}
+HANGANG = [
+    [37.513, 126.958],[37.515, 126.940],[37.516, 126.920],
+    [37.518, 126.900],[37.523, 126.878],[37.528, 126.858],
+]
+
+# ── 미래 예측 데이터 ──────────────────────────────────────────────────────────
+FUTURE = {
+    "year": [2026, 2030, 2040, 2050],
+    "SSP245_노량진_DO": [8.26, 7.93, 7.43, 6.96],
+    "SSP245_선유_DO":   [8.04, 7.73, 7.24, 6.77],
+    "SSP245_노량진_pH": [7.275, 7.267, 7.247, 7.227],
+    "SSP245_선유_pH":   [7.305, 7.297, 7.277, 7.257],
+    "SSP585_노량진_DO": [8.11, 7.51, 6.51, 5.54],
+    "SSP585_선유_DO":   [7.90, 7.31, 6.34, 5.37],
+    "SSP585_노량진_pH": [7.275, 7.257, 7.207, 7.137],
+    "SSP585_선유_pH":   [7.305, 7.287, 7.237, 7.167],
+}
+df_future = pd.DataFrame(FUTURE)
+
+# ── 정책 데이터 ───────────────────────────────────────────────────────────────
+MAP_POLICIES = [
+    {
+        "phase": "단기", "phase_label": "단기 (2026~2030)",
+        "badge": "badge-short", "card": "short", "icon": "🌬️",
+        "title": "폭기(曝氣) 시설 확충",
+        "effect": "DO 최솟값 +2~4 mg/L 즉각 상승",
+        "detail": "수중 산기관·폭기 선박 상시 운영으로 여름철 DO 급락 긴급 대응",
+        "do_impact_nry": 2.5, "do_impact_syu": 2.0,
+    },
+    {
+        "phase": "단기", "phase_label": "단기 (2026~2030)",
+        "badge": "badge-short", "card": "short", "icon": "📡",
+        "title": "실시간 모니터링 고도화",
+        "effect": "DO 위험 6~12시간 전 조기 경보",
+        "detail": "AI 예측 모델 + IoT 센서망으로 10분 단위 수질 수집 및 자동 경보",
+        "do_impact_nry": 0.3, "do_impact_syu": 0.3,
+    },
+    {
+        "phase": "단기", "phase_label": "단기 (2026~2030)",
+        "badge": "badge-short", "card": "short", "icon": "🌧️",
+        "title": "초기 우수 저류조 설치",
+        "effect": "강우 후 DO 급락 30~50% 완충",
+        "detail": "강변 초기 우수 저류조·투수성 포장재 확대로 도시 오염 유출 차단",
+        "do_impact_nry": 0.8, "do_impact_syu": 1.2,
+    },
+    {
+        "phase": "중기", "phase_label": "중기 (2031~2040)",
+        "badge": "badge-mid", "card": "mid", "icon": "🏭",
+        "title": "하수처리장 고도화",
+        "effect": "총인 50% 감소 → DO +1.0~1.5 mg/L",
+        "detail": "중랑·탄천 처리장 고도처리(A²O, MBR) 도입, 방류수 총인 0.2mg/L 이하",
+        "do_impact_nry": 1.2, "do_impact_syu": 1.5,
+    },
+    {
+        "phase": "중기", "phase_label": "중기 (2031~2040)",
+        "badge": "badge-mid", "card": "mid", "icon": "🌿",
+        "title": "생태습지·수변완충구역 확대",
+        "effect": "수온 1~2°C 냉각, 질소 최대 500kg/ha 제거",
+        "detail": "한강변 정수식물 군락 복원, 수변 완충 녹지대(30m) 지정 및 생태공원 확대",
+        "do_impact_nry": 0.6, "do_impact_syu": 0.9,
+    },
+    {
+        "phase": "장기", "phase_label": "장기 (2041~2050)",
+        "badge": "badge-long", "card": "long", "icon": "🌳",
+        "title": "도시 열섬 완화·탄소 감축",
+        "effect": "열섬 1°C 완화 → DO +0.1~0.16 mg/L",
+        "detail": "옥상 녹화·도시 숲·바람길 조성으로 서울 열섬 완화, 한강 수온을 기후정책 공식 지표 채택",
+        "do_impact_nry": 0.5, "do_impact_syu": 0.4,
+    },
+]
+
+POLICY_MARKERS = {
+    "폭기(曝氣) 시설 확충": [
+        {"lat": 37.513, "lon": 126.920, "icon": "🌬️", "label": "폭기시설", "color": "#3498DB"},
+        {"lat": 37.524, "lon": 126.888, "icon": "🌬️", "label": "폭기시설", "color": "#3498DB"},
+    ],
+    "실시간 모니터링 고도화": [
+        {"lat": 37.516, "lon": 126.935, "icon": "📡", "label": "모니터링", "color": "#8E44AD"},
+        {"lat": 37.526, "lon": 126.875, "icon": "📡", "label": "모니터링", "color": "#8E44AD"},
+    ],
+    "초기 우수 저류조 설치": [
+        {"lat": 37.510, "lon": 126.930, "icon": "🌧️", "label": "저류조",   "color": "#2980B9"},
+        {"lat": 37.530, "lon": 126.870, "icon": "🌧️", "label": "저류조",   "color": "#2980B9"},
+    ],
+    "하수처리장 고도화": [
+        {"lat": 37.520, "lon": 126.960, "icon": "🏭", "label": "고도처리장","color": "#27AE60"},
+    ],
+    "생태습지·수변완충구역 확대": [
+        {"lat": 37.512, "lon": 126.910, "icon": "🌿", "label": "생태습지", "color": "#2ECC71"},
+        {"lat": 37.528, "lon": 126.865, "icon": "🌿", "label": "생태습지", "color": "#2ECC71"},
+    ],
+    "도시 열섬 완화·탄소 감축": [
+        {"lat": 37.516, "lon": 126.945, "icon": "🌳", "label": "도시숲",   "color": "#1E8449"},
+        {"lat": 37.522, "lon": 126.895, "icon": "🌳", "label": "도시숲",   "color": "#1E8449"},
+    ],
+}
+
+# ── 지도 헬퍼 함수 ────────────────────────────────────────────────────────────
+def do_color(val):
+    if val >= 7.5:   return "#2ECC71"
+    elif val >= 5.0: return "#F39C12"
+    elif val >= 2.0: return "#E67E22"
+    else:            return "#E74C3C"
+
+def do_grade_label(val):
+    if val >= 7.5:   return "🟢 1등급"
+    elif val >= 5.0: return "🟡 2~3등급"
+    elif val >= 2.0: return "🟠 4등급"
+    else:            return "🔴 5등급↓"
+
+def build_map(center, do_nry, do_syu, ph_nry, ph_syu, year, label, policy_markers=None):
+    m = folium.Map(location=center, zoom_start=13, tiles="CartoDB positron")
+    folium.PolyLine(HANGANG, color="#4A90D9", weight=8, opacity=0.35, tooltip="한강").add_to(m)
+    for name, lat, lon, do_val, ph_val in [
+        ("노량진", STATIONS["노량진"]["lat"], STATIONS["노량진"]["lon"], do_nry, ph_nry),
+        ("선유",   STATIONS["선유"]["lat"],   STATIONS["선유"]["lon"],   do_syu, ph_syu),
+    ]:
+        color = do_color(do_val)
+        grade = do_grade_label(do_val)
+        popup_html = f"""
+        <div style='font-family:Arial;min-width:190px'>
+            <h4 style='color:{color};margin:0 0 6px 0'>📍 {name} 측정소</h4>
+            <hr style='margin:4px 0'>
+            <b>조건:</b> {label}<br><b>연도:</b> {year}년<br>
+            <hr style='margin:4px 0'>
+            <b>DO:</b> <span style='color:{color};font-size:15px;font-weight:700'>{do_val:.2f} mg/L</span><br>
+            <b>pH:</b> {ph_val:.3f}<br><b>등급:</b> {grade}
+        </div>"""
+        folium.CircleMarker(
+            location=[lat, lon],
+            radius=max(14 + (do_val - 5) * 2.5, 10),
+            color=color, fill=True, fill_color=color, fill_opacity=0.75,
+            popup=folium.Popup(popup_html, max_width=240),
+            tooltip=f"{name} | DO {do_val:.2f} mg/L | {grade}"
+        ).add_to(m)
+        folium.Marker(
+            location=[lat + 0.0028, lon],
+            icon=folium.DivIcon(html=f"""
+                <div style='background:{color};color:white;padding:3px 8px;
+                border-radius:6px;font-size:12px;font-weight:700;
+                box-shadow:0 2px 5px rgba(0,0,0,0.25);white-space:nowrap'>
+                {name} {do_val:.1f} mg/L</div>""")
+        ).add_to(m)
+    if policy_markers:
+        for pm in policy_markers:
+            folium.Marker(
+                location=[pm["lat"], pm["lon"]],
+                icon=folium.DivIcon(html=f"""
+                    <div style='background:white;border:2px solid {pm["color"]};
+                    color:{pm["color"]};padding:3px 7px;border-radius:8px;
+                    font-size:11px;font-weight:700;
+                    box-shadow:0 2px 5px rgba(0,0,0,0.2);white-space:nowrap'>
+                    {pm["icon"]} {pm["label"]}</div>"""),
+                tooltip=pm["label"]
+            ).add_to(m)
+    legend = f"""
+    <div style='position:fixed;bottom:20px;left:20px;z-index:1000;
+    background:white;padding:10px 14px;border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.18);font-family:Arial;font-size:12px'>
+    <b>DO 등급</b><br>
+    <span style='color:#2ECC71'>●</span> 1등급 ≥7.5<br>
+    <span style='color:#F39C12'>●</span> 2~3등급 ≥5.0<br>
+    <span style='color:#E67E22'>●</span> 4등급 ≥2.0<br>
+    <span style='color:#E74C3C'>●</span> 5등급 &lt;2.0
+    </div>"""
+    m.get_root().html.add_child(folium.Element(legend))
+    return m
 
 # ── 데이터 로드 ───────────────────────────────────────────────────────────────
 @st.cache_data
@@ -1015,6 +1190,113 @@ with tab6:
     st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
     st.plotly_chart(fig_road, use_container_width=True, config={'displaylogo': False})
     st.markdown('</div>', unsafe_allow_html=True)
+
+    # ── 정책 실행 전 vs 후 비교 지도 ─────────────────────────────────────────
+    st.markdown('<div class="sec-hd" style="margin-top:40px;">🗺️ 정책 실행 전 vs 후 — DO 수질 지도 비교</div>',
+                unsafe_allow_html=True)
+    st.caption("정책을 선택하고 연도를 설정하면, 실행하지 않았을 때와 실행했을 때의 DO 변화를 지도로 비교합니다.")
+
+    pc1, pc2, pc3 = st.columns([2, 2, 1])
+    with pc1:
+        selected_policies = st.multiselect(
+            "적용할 정책 선택 (복수 선택 가능)",
+            options=[p["title"] for p in MAP_POLICIES],
+            default=["폭기(曝氣) 시설 확충", "하수처리장 고도화"],
+        )
+    with pc2:
+        map_scenario = st.selectbox(
+            "기후 시나리오",
+            ["SSP5-8.5 (고위 — 현재 추세)", "SSP2-4.5 (중위 — 감축 지속)"],
+            key="map_scen"
+        )
+        map_scen_key = "SSP585" if "SSP5-8.5" in map_scenario else "SSP245"
+    with pc3:
+        map_year = st.select_slider(
+            "예측 연도", options=[2026, 2030, 2040, 2050], value=2040, key="map_year"
+        )
+
+    # 기준 DO (정책 미실행)
+    base_row    = df_future[df_future["year"] == map_year].iloc[0]
+    base_do_nry = base_row[f"{map_scen_key}_노량진_DO"]
+    base_do_syu = base_row[f"{map_scen_key}_선유_DO"]
+    base_ph_nry = base_row[f"{map_scen_key}_노량진_pH"]
+    base_ph_syu = base_row[f"{map_scen_key}_선유_pH"]
+
+    # 정책 적용 후 DO
+    total_imp_nry = sum(p["do_impact_nry"] for p in MAP_POLICIES if p["title"] in selected_policies)
+    total_imp_syu = sum(p["do_impact_syu"] for p in MAP_POLICIES if p["title"] in selected_policies)
+    after_do_nry  = min(base_do_nry + total_imp_nry, 12.0)
+    after_do_syu  = min(base_do_syu + total_imp_syu, 12.0)
+    imp_nry = after_do_nry - base_do_nry
+    imp_syu = after_do_syu - base_do_syu
+    scen_label2 = "SSP5-8.5" if map_scen_key == "SSP585" else "SSP2-4.5"
+
+    # 활성 시설 마커 수집
+    active_markers = []
+    for title in selected_policies:
+        active_markers.extend(POLICY_MARKERS.get(title, []))
+
+    # 요약 배너
+    st.markdown(f"""
+    <div style='display:flex;gap:16px;margin:10px 0 16px 0;flex-wrap:wrap'>
+        <div style='flex:1;min-width:240px;background:#FEF9E7;border-left:4px solid #F39C12;
+        padding:10px 14px;border-radius:8px'>
+            <b>📍 정책 미실행</b> | {scen_label2} {map_year}년<br>
+            노량진 DO: <b style='color:{do_color(base_do_nry)}'>{base_do_nry:.2f} mg/L</b> &nbsp;
+            선유 DO: <b style='color:{do_color(base_do_syu)}'>{base_do_syu:.2f} mg/L</b>
+        </div>
+        <div style='flex:1;min-width:240px;background:#EAFAF1;border-left:4px solid #27AE60;
+        padding:10px 14px;border-radius:8px'>
+            <b>✅ 정책 실행 후</b> | 선택 정책 {len(selected_policies)}개 적용<br>
+            노량진 DO: <b style='color:{do_color(after_do_nry)}'>{after_do_nry:.2f} mg/L</b>
+            <span style='color:#27AE60;font-size:12px'>(+{imp_nry:.2f})</span> &nbsp;
+            선유 DO: <b style='color:{do_color(after_do_syu)}'>{after_do_syu:.2f} mg/L</b>
+            <span style='color:#27AE60;font-size:12px'>(+{imp_syu:.2f})</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 좌우 지도
+    map_col1, map_col2 = st.columns(2)
+    center = [37.522, 126.906]
+    with map_col1:
+        st.markdown("**❌ 정책 미실행**")
+        m_before = build_map(center, base_do_nry, base_do_syu,
+                             base_ph_nry, base_ph_syu,
+                             map_year, f"미실행 ({scen_label2})")
+        st_folium(m_before, width=None, height=400, key="map_before")
+    with map_col2:
+        st.markdown("**✅ 정책 실행 후**")
+        m_after = build_map(center, after_do_nry, after_do_syu,
+                            base_ph_nry, base_ph_syu,
+                            map_year, f"실행 후 ({scen_label2})",
+                            policy_markers=active_markers)
+        st_folium(m_after, width=None, height=400, key="map_after")
+
+    # 등급 변화 요약
+    st.divider()
+    st.markdown("**📊 수질 등급 변화 요약**")
+    sg1, sg2 = st.columns(2)
+    with sg1:
+        st.metric("노량진 DO", f"{after_do_nry:.2f} mg/L",
+                  delta=f"+{imp_nry:.2f} mg/L",
+                  help=f"미실행: {base_do_nry:.2f} → 실행 후: {after_do_nry:.2f}")
+        st.caption(f"등급 변화: {do_grade_label(base_do_nry)} → {do_grade_label(after_do_nry)}")
+    with sg2:
+        st.metric("선유 DO", f"{after_do_syu:.2f} mg/L",
+                  delta=f"+{imp_syu:.2f} mg/L",
+                  help=f"미실행: {base_do_syu:.2f} → 실행 후: {after_do_syu:.2f}")
+        st.caption(f"등급 변화: {do_grade_label(base_do_syu)} → {do_grade_label(after_do_syu)}")
+
+    if map_scen_key == "SSP585" and map_year >= 2040:
+        st.error(f"🚨 SSP5-8.5 {map_year}년: DO 위험 임계치(5.0 mg/L) 근접! 정책 실행이 시급합니다.")
+    elif map_scen_key == "SSP585" and map_year >= 2030:
+        st.warning("⚠️ SSP5-8.5 시나리오 — 2030년 이후 DO 감소 추세 본격화. 단기 정책 선행 필요.")
+    else:
+        st.success(f"✅ {map_year}년 {scen_label2} — 정책 실행 시 수질 관리 가능 범위 유지")
+
+    st.info("💡 **핵심 메시지**: 기후변화 속 여름철 DO 취약성이 심화되고 있습니다. "
+            "단기 폭기시설·모니터링부터 장기 탄소감축까지 3단계 정책이 한강의 미래를 결정합니다.")
 
 
 # 푸터
