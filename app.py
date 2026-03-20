@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import zipfile, csv, os
+import os, csv
 from collections import defaultdict
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -40,7 +40,6 @@ st.markdown("""
     color: rgba(255,255,255,0.85); border-radius: 20px; padding: 4px 14px;
     font-size: 12px; font-weight: 500;
 }
-
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
 .kpi {
     background: #fff; border-radius: 14px; padding: 18px 20px 16px;
@@ -53,7 +52,6 @@ st.markdown("""
 .kpi-value  { font-size: 28px; font-weight: 800; color: #111827; line-height: 1; }
 .kpi-unit   { font-size: 13px; font-weight: 400; color: #6b7280; margin-left: 2px; }
 .kpi-range  { font-size: 11px; color: #9ca3af; margin-top: 5px; }
-
 .sec-hd {
     font-size: 16px; font-weight: 700; color: #0c1e3c;
     border-left: 4px solid #2563eb; padding-left: 12px;
@@ -76,7 +74,6 @@ st.markdown("""
 .ins-card.indigo { border-left-color: #6366f1; }
 .ins-title { font-size: 14.5px; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
 .ins-body  { font-size: 13.5px; color: #374151; line-height: 1.8; }
-
 .badge { display: inline-block; border-radius: 20px; padding: 2px 10px; font-size: 11.5px; font-weight: 600; margin: 0 2px; }
 .b-blue   { background:#dbeafe; color:#1d4ed8; }
 .b-red    { background:#fee2e2; color:#b91c1c; }
@@ -84,7 +81,6 @@ st.markdown("""
 .b-orange { background:#ffedd5; color:#c2410c; }
 .b-gray   { background:#f3f4f6; color:#374151; }
 .b-purple { background:#f3e8ff; color:#7e22ce; }
-
 .warn-box {
     background: #fef9c3; border: 1px solid #fde047; border-radius: 10px;
     padding: 12px 18px; font-size: 13px; color: #713f12; margin-bottom: 16px;
@@ -98,56 +94,70 @@ st.markdown("""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 데이터 로드
+# 데이터 로드 (CSV 직접 읽기 - ZIP 의존 없음)
 # ─────────────────────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
     base = os.path.dirname(os.path.abspath(__file__))
-    data_dir = os.path.join(base, 'data')
-    os.makedirs(data_dir, exist_ok=True)
 
-    ph_path = os.path.join(data_dir, '수소이온농도.csv')
-    do_path = os.path.join(data_dir, '용존산소.csv')
+    # 후보 경로 목록 (로컬 · Streamlit Cloud 모두 대응)
+    ph_candidates = [
+        os.path.join(base, 'ph.csv'),
+        os.path.join(base, '수소이온농도.csv'),
+        os.path.join(base, 'data', '수소이온농도.csv'),
+    ]
+    do_candidates = [
+        os.path.join(base, 'do.csv'),
+        os.path.join(base, '용존산소.csv'),
+        os.path.join(base, 'data', '용존산소.csv'),
+    ]
 
-    # ZIP에서 추출 (data 폴더에 CSV가 없을 때)
-    if not os.path.exists(ph_path):
-        zip_path = os.path.join(base, '서울시_요일별_한강_수질_현황_2020년_.zip')
-        if os.path.exists(zip_path):
-            with zipfile.ZipFile(zip_path) as z:
-                for info in z.infolist():
-                    try:
-                        real_name = info.filename.encode('cp437').decode('cp949')
-                    except Exception:
-                        real_name = info.filename
-                    data = z.read(info.filename)
-                    with open(os.path.join(data_dir, real_name), 'wb') as f:
-                        f.write(data)
+    def find_file(candidates):
+        for p in candidates:
+            if os.path.exists(p):
+                return p
+        tried = '\n  '.join(candidates)
+        raise FileNotFoundError(
+            f"데이터 파일을 찾을 수 없습니다.\n시도한 경로:\n  {tried}\n\n"
+            "ph.csv 와 do.csv (또는 수소이온농도.csv, 용존산소.csv) 를 "
+            "app.py 와 같은 폴더에 놓아 주세요."
+        )
 
-    def parse_csv(path):
-        rows = []
-        for enc in ['cp949', 'euc-kr', 'utf-8-sig', 'utf-8']:
+    def read_csv(path):
+        """인코딩 자동 감지 + 모든 예외 처리"""
+        for enc in ['utf-8', 'utf-8-sig', 'cp949', 'euc-kr']:
             try:
-                with open(path, encoding=enc) as f:
-                    for row in csv.DictReader(f):
+                rows = []
+                with open(path, encoding=enc, errors='strict') as f:
+                    reader = csv.DictReader(f)
+                    if reader.fieldnames is None:
+                        continue
+                    for row in reader:
                         rows.append(row)
-                return rows
-            except (UnicodeDecodeError, FileNotFoundError):
+                if rows:
+                    return rows
+            except (UnicodeDecodeError, UnicodeError):
                 continue
-        raise ValueError(f"파일 로드 실패: {path}")
+            except Exception:
+                continue
+        raise ValueError(f"파일을 읽을 수 없습니다: {path}")
 
     def daily_means(rows, col):
         daily = defaultdict(list)
         for r in rows:
-            v = r[col].strip()
+            v = r.get(col, '').strip()
             if v and v != '-':
                 try:
                     daily[r['일시'].split(' ')[0]].append(float(v))
-                except Exception:
+                except (ValueError, KeyError):
                     pass
         return {d: round(sum(vs) / len(vs), 3) for d, vs in daily.items()}
 
-    ph_rows = parse_csv(ph_path)
-    do_rows = parse_csv(do_path)
+    ph_path = find_file(ph_candidates)
+    do_path = find_file(do_candidates)
+
+    ph_rows = read_csv(ph_path)
+    do_rows = read_csv(do_path)
 
     ph_ny = daily_means(ph_rows, '노량진')
     ph_sy = daily_means(ph_rows, '선유')
@@ -165,7 +175,17 @@ def load_data():
     return df
 
 
-df = load_data()
+# 데이터 로드 (에러 시 명확한 메시지 표시)
+try:
+    df = load_data()
+except FileNotFoundError as e:
+    st.error(f"📂 **파일을 찾을 수 없습니다**\n\n{e}")
+    st.info("**배포 체크리스트**\n- `ph.csv` 와 `do.csv` 를 `app.py` 와 같은 폴더에 업로드했는지 확인하세요.\n- Streamlit Cloud라면 GitHub 저장소에 파일이 포함되어 있어야 합니다.")
+    st.stop()
+except Exception as e:
+    st.error(f"❌ **데이터 로드 오류**: {e}")
+    st.stop()
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Hero & KPI
@@ -210,6 +230,7 @@ st.markdown("""
   </div>
 </div>
 """, unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 탭
@@ -549,78 +570,64 @@ with tab5:
     </div>
     """, unsafe_allow_html=True)
 
-    # 시나리오 정의
     SCENARIOS = {
         'SSP2-4.5 (중위 시나리오)': {
-            'color': '#2563eb', 'dash': 'solid',
-            'temp_2050': 1.5,           # 2050년까지 기온 상승 (°C)
-            'do_per_c': 0.20,           # °C당 DO 감소 (Henry's Law 기반)
-            'summer_penalty': 0.08,     # 하절기 추가 DO 감소 (연간 반영분)
-            'ph_per_yr': -0.002,        # 연간 pH 변화 (CO₂ 증가 효과)
+            'color_ny': '#2563eb', 'color_sy': '#d97706', 'dash': 'solid',
+            'temp_2050': 1.5, 'do_per_c': 0.20, 'summer_penalty': 0.08, 'ph_per_yr': -0.002,
         },
         'SSP5-8.5 (고위 시나리오)': {
-            'color': '#dc2626', 'dash': 'dash',
-            'temp_2050': 3.0,
-            'do_per_c': 0.22,
-            'summer_penalty': 0.18,
-            'ph_per_yr': -0.005,
+            'color_ny': '#2563eb', 'color_sy': '#d97706', 'dash': 'dash',
+            'temp_2050': 3.0, 'do_per_c': 0.22, 'summer_penalty': 0.18, 'ph_per_yr': -0.005,
         },
     }
 
     BASE = {'do_ny': 8.463, 'do_sy': 8.260, 'ph_ny': 7.287, 'ph_sy': 7.317}
     future_years = np.arange(2020, 2051)
 
-    def forecast(base, years, sc, kind='do'):
-        results, noises = [], []
-        for y in years:
+    def forecast(base, sc, kind='do'):
+        vals, noises = [], []
+        for y in future_years:
             n = y - 2020
             frac = n / 30
             if kind == 'do':
-                temp = sc['temp_2050'] * frac
-                val = base - sc['do_per_c'] * temp - sc['summer_penalty'] * frac
+                val = base - sc['do_per_c'] * sc['temp_2050'] * frac - sc['summer_penalty'] * frac
                 noise = 0.3 + 0.5 * frac
             else:
                 val = base + sc['ph_per_yr'] * n
                 noise = 0.05 + 0.1 * frac
-            results.append(val)
+            vals.append(val)
             noises.append(noise)
-        return np.array(results), np.array(noises)
+        return np.array(vals), np.array(noises)
 
     sc_name = st.selectbox("시나리오 선택", list(SCENARIOS.keys()), key='sc_sel')
     sc = SCENARIOS[sc_name]
 
-    do_ny_v, do_ny_n = forecast(BASE['do_ny'], future_years, sc, 'do')
-    do_sy_v, do_sy_n = forecast(BASE['do_sy'], future_years, sc, 'do')
-    ph_ny_v, ph_ny_n = forecast(BASE['ph_ny'], future_years, sc, 'ph')
-    ph_sy_v, ph_sy_n = forecast(BASE['ph_sy'], future_years, sc, 'ph')
+    do_ny_v, do_ny_n = forecast(BASE['do_ny'], sc, 'do')
+    do_sy_v, do_sy_n = forecast(BASE['do_sy'], sc, 'do')
+    ph_ny_v, ph_ny_n = forecast(BASE['ph_ny'], sc, 'ph')
+    ph_sy_v, ph_sy_n = forecast(BASE['ph_sy'], sc, 'ph')
+
+    def make_band_traces(years, vals, noise, hex_color, name):
+        r, g, b = int(hex_color[1:3],16), int(hex_color[3:5],16), int(hex_color[5:7],16)
+        fill_color = f'rgba({r},{g},{b},0.10)'
+        band = go.Scatter(
+            x=list(years) + list(years[::-1]),
+            y=list(vals + noise) + list((vals - noise)[::-1]),
+            fill='toself', fillcolor=fill_color,
+            line=dict(color='rgba(255,255,255,0)'),
+            showlegend=False, name=f'{name} 불확실도')
+        line = go.Scatter(
+            x=years, y=np.round(vals, 3), name=f'{name} 예측', mode='lines',
+            line=dict(color=hex_color, width=2.2, dash=sc['dash']))
+        return band, line
 
     pred_tabs = st.tabs(["용존산소 (DO) 예측", "수소이온농도 (pH) 예측"])
 
-    def band(fig, years, vals, noise, color, name, row=None):
-        x = list(years) + list(years[::-1])
-        y = list(vals + noise) + list((vals - noise)[::-1])
-        kw = dict(x=x, y=y, fill='toself',
-                  fillcolor=color.replace(')', ',0.10)').replace('rgb', 'rgba')
-                            if color.startswith('rgb') else f'rgba(0,0,0,0.08)',
-                  line=dict(color='rgba(255,255,255,0)'), showlegend=False, name=f'{name} 불확실도')
-        # 단순 반투명 처리
-        alpha_color = f'rgba({int(color[1:3],16)},{int(color[3:5],16)},{int(color[5:7],16)},0.10)'
-        kw['fillcolor'] = alpha_color
-        if row:
-            fig.add_trace(go.Scatter(**kw), row=row, col=1)
-        else:
-            fig.add_trace(go.Scatter(**kw))
-
     with pred_tabs[0]:
         fig_f = go.Figure()
-        band(fig_f, future_years, do_ny_v, do_ny_n, '#2563eb', '노량진')
-        band(fig_f, future_years, do_sy_v, do_sy_n, '#d97706', '선유')
-        fig_f.add_trace(go.Scatter(x=future_years, y=np.round(do_ny_v, 3),
-                                   name='노량진 예측', mode='lines',
-                                   line=dict(color='#2563eb', width=2.2, dash=sc['dash'])))
-        fig_f.add_trace(go.Scatter(x=future_years, y=np.round(do_sy_v, 3),
-                                   name='선유 예측', mode='lines',
-                                   line=dict(color='#d97706', width=2.2, dash=sc['dash'])))
+        b1, l1 = make_band_traces(future_years, do_ny_v, do_ny_n, '#2563eb', '노량진')
+        b2, l2 = make_band_traces(future_years, do_sy_v, do_sy_n, '#d97706', '선유')
+        fig_f.add_traces([b1, b2, l1, l2])
         fig_f.add_trace(go.Scatter(x=[2020], y=[BASE['do_ny']], mode='markers',
                                    name='노량진 실측(2020)',
                                    marker=dict(color='#2563eb', size=10)))
@@ -631,8 +638,7 @@ with tab5:
                         annotation_text='수생태계 위험 하한 5.0',
                         annotation_font_color='#dc2626')
         fig_f.add_hline(y=7.5, line_dash='dot', line_color='#16a34a',
-                        annotation_text='1등급 기준 7.5',
-                        annotation_font_color='#16a34a')
+                        annotation_text='1등급 기준 7.5', annotation_font_color='#16a34a')
         fig_f.add_vline(x=2026, line_dash='dot', line_color='#6b7280',
                         annotation_text='현재(2026)', annotation_font_size=11)
         fig_f.update_layout(
@@ -648,14 +654,9 @@ with tab5:
 
     with pred_tabs[1]:
         fig_fp = go.Figure()
-        band(fig_fp, future_years, ph_ny_v, ph_ny_n, '#2563eb', '노량진')
-        band(fig_fp, future_years, ph_sy_v, ph_sy_n, '#d97706', '선유')
-        fig_fp.add_trace(go.Scatter(x=future_years, y=np.round(ph_ny_v, 3),
-                                    name='노량진 예측', mode='lines',
-                                    line=dict(color='#2563eb', width=2.2, dash=sc['dash'])))
-        fig_fp.add_trace(go.Scatter(x=future_years, y=np.round(ph_sy_v, 3),
-                                    name='선유 예측', mode='lines',
-                                    line=dict(color='#d97706', width=2.2, dash=sc['dash'])))
+        b3, l3 = make_band_traces(future_years, ph_ny_v, ph_ny_n, '#2563eb', '노량진')
+        b4, l4 = make_band_traces(future_years, ph_sy_v, ph_sy_n, '#d97706', '선유')
+        fig_fp.add_traces([b3, b4, l3, l4])
         fig_fp.add_trace(go.Scatter(x=[2020], y=[BASE['ph_ny']], mode='markers',
                                     name='노량진 실측(2020)',
                                     marker=dict(color='#2563eb', size=10)))
@@ -691,8 +692,7 @@ with tab5:
         'pH 선유':           [f"{ph_sy_v[i]:.3f}" for i in midxs],
         '수생태계 상태': [
             '🚨 위험' if do_ny_v[i] < 5.0 or do_sy_v[i] < 5.0
-            else ('⚠️ 주의' if do_ny_v[i] < 6.5 or do_sy_v[i] < 6.5
-                  else '✅ 양호')
+            else ('⚠️ 주의' if do_ny_v[i] < 6.5 or do_sy_v[i] < 6.5 else '✅ 양호')
             for i in midxs
         ],
     })
@@ -707,11 +707,11 @@ with tab5:
         <div class="ins-card blue">
           <div class="ins-title">🌿 SSP2-4.5 — 중위 시나리오</div>
           <div class="ins-body">
-            온실가스 감축 정책이 지속되는 경로입니다. 2050년 수도권 기온 <b>+1.5°C</b> 상승 예상.<br><br>
+            온실가스 감축 정책 지속 경로. 2050년 기온 <b>+1.5°C</b> 상승 예상.<br><br>
             • DO 연평균: 노량진 <b>~7.3</b>, 선유 <b>~7.1 mg/L</b><br>
-            • pH: 대기 CO₂ 증가 효과로 <b>~7.2–7.3</b> 유지<br>
+            • pH: CO₂ 증가 효과로 <b>~7.2–7.3</b> 유지<br>
             • 여름 DO 5 mg/L 하회 빈도 소폭 증가<br>
-            • 1등급 유지 기간: 연중 약 50% → 40%로 축소 예상
+            • 1등급 유지 기간: 연중 50% → 40%로 축소 예상
           </div>
         </div>
         """, unsafe_allow_html=True)
@@ -720,11 +720,11 @@ with tab5:
         <div class="ins-card red">
           <div class="ins-title">🔥 SSP5-8.5 — 고위 시나리오</div>
           <div class="ins-body">
-            현재 추세 지속 시 최악 경로입니다. 2050년 수도권 기온 <b>+3.0°C</b> 상승 예상.<br><br>
+            현재 추세 지속 시 최악 경로. 2050년 기온 <b>+3.0°C</b> 상승 예상.<br><br>
             • DO 연평균: 노량진 <b>~6.5</b>, 선유 <b>~6.3 mg/L</b><br>
             • pH: 산성화 가속으로 <b>~7.0–7.1</b>로 하락<br>
             • 여름 DO 3 mg/L 이하 구간 상시 발생 우려<br>
-            • 민감 어종 서식 가능 기간: 연중 8개월 → <b>5개월 미만</b> 가능성
+            • 민감 어종 서식 기간: 연중 8개월 → <b>5개월 미만</b> 가능성
           </div>
         </div>
         """, unsafe_allow_html=True)
