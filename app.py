@@ -151,6 +151,90 @@ st.markdown("""
 .policy-sub   { background: #f9fafb; border-radius: 8px; padding: 12px 14px; }
 .policy-sub-title { font-size: 12px; font-weight: 700; color: #6b7280; margin-bottom: 6px; letter-spacing: 0.05em; }
 .policy-sub-body  { font-size: 13px; color: #374151; line-height: 1.7; }
+
+/* ── 수질 해석 탭 달력형 ─────────────────────────────────────────────────── */
+.cal-wrap{background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:24px}
+.cal-header{background:linear-gradient(135deg,#0c1e3c,#1e4d7b);padding:20px 28px 16px;display:flex;align-items:center;justify-content:space-between}
+.cal-header-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.3px}
+.cal-header-sub{font-size:12px;color:rgba(255,255,255,0.55);margin-top:3px}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap}
+.cal-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.75);font-weight:600}
+.cal-legend-dot{width:10px;height:10px;border-radius:50%}
+.cal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.cal-month{padding:18px 20px;border-right:1px solid #f1f5f9;border-bottom:1px solid #f1f5f9;transition:background 0.15s;position:relative}
+.cal-month:hover{background:#f8fafc}
+.cal-month:nth-child(4n){border-right:none}
+.cal-month:nth-child(n+9){border-bottom:none}
+.cal-month-name{font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:10px}
+.cal-vals{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.cal-val-row{display:flex;align-items:center;justify-content:space-between}
+.cal-val-label{font-size:10.5px;color:#94a3b8;font-weight:600}
+.cal-val-num{font-size:15px;font-weight:900;line-height:1}
+.cal-val-unit{font-size:9px;font-weight:500;color:#94a3b8;margin-left:1px}
+.cal-do-bar-wrap{height:4px;background:#f1f5f9;border-radius:99px;margin:8px 0 6px;overflow:hidden}
+.cal-do-bar{height:100%;border-radius:99px}
+.cal-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:4px}
+.cal-insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:20px}
+.cal-insight-card{border-radius:14px;padding:18px 20px;border-left:4px solid #e5e7eb}
+.cal-insight-card.spring{background:#fefce8;border-left-color:#eab308}
+.cal-insight-card.summer{background:#fff1f2;border-left-color:#f43f5e}
+.cal-insight-card.autumn{background:#fff7ed;border-left-color:#f97316}
+.cal-insight-card.winter{background:#eff6ff;border-left-color:#3b82f6}
+.cal-insight-title{font-size:13px;font-weight:800;color:#1e293b;margin-bottom:8px}
+.cal-insight-body{font-size:12.5px;color:#475569;line-height:1.75}
+
+/* ── 수질 정책 탭 카드형 ─────────────────────────────────────────────────── */
+.policy-intro{background:linear-gradient(135deg,#0c1e3c 0%,#134e7a 100%);border-radius:20px;padding:36px 44px;margin-bottom:40px;position:relative;overflow:hidden}
+.policy-intro::after{content:'한강';position:absolute;right:-10px;top:-20px;font-size:160px;font-weight:900;color:rgba(255,255,255,0.04);line-height:1;pointer-events:none}
+.policy-intro-label{font-size:11px;font-weight:700;letter-spacing:0.18em;color:#38bdf8;text-transform:uppercase;margin-bottom:10px}
+.policy-intro-title{font-size:26px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:14px}
+.policy-intro-body{font-size:13.5px;color:rgba(255,255,255,0.65);line-height:1.85;max-width:680px}
+.policy-intro-stats{display:flex;gap:32px;margin-top:24px;flex-wrap:wrap}
+.policy-intro-stat-val{font-size:28px;font-weight:900;color:#fff;line-height:1}
+.policy-intro-stat-label{font-size:11px;color:rgba(255,255,255,0.5);margin-top:4px}
+.phase-header{display:flex;align-items:center;gap:14px;margin:44px 0 20px}
+.phase-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:0.04em}
+.phase-pill.short{background:#dbeafe;color:#1d4ed8}
+.phase-pill.mid{background:#dcfce7;color:#15803d}
+.phase-pill.long{background:#f3e8ff;color:#7e22ce}
+.phase-line{flex:1;height:1px;background:linear-gradient(to right,#e5e7eb,transparent)}
+.pcard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:12px}
+.pcard-grid.two{grid-template-columns:repeat(2,1fr)}
+.pcard{background:#fff;border-radius:16px;padding:0;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;transition:transform 0.18s ease,box-shadow 0.18s ease;position:relative}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(0,0,0,0.13)}
+.pcard-accent{height:4px;width:100%}
+.pcard-inner{padding:20px 22px 22px}
+.pcard-icon-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pcard-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.pcard-num{font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9ca3af}
+.pcard-title{font-size:14.5px;font-weight:800;color:#111827;line-height:1.4;margin-bottom:10px}
+.pcard-detail{font-size:12.5px;color:#6b7280;line-height:1.7;margin-bottom:16px}
+.pcard-divider{height:1px;background:#f3f4f6;margin-bottom:14px}
+.pcard-effect-label{font-size:10px;font-weight:700;letter-spacing:0.12em;color:#9ca3af;margin-bottom:6px;text-transform:uppercase}
+.pcard-effect{font-size:13px;font-weight:700;line-height:1.5}
+.pcard-do-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pcard-do-chip{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px}
+.roadmap-wrap{background:#f8fafc;border-radius:18px;padding:32px 36px;margin:36px 0 28px}
+.roadmap-title{font-size:13px;font-weight:700;letter-spacing:0.1em;color:#64748b;text-transform:uppercase;margin-bottom:28px}
+.roadmap-timeline{display:flex;gap:0;position:relative}
+.roadmap-timeline::before{content:'';position:absolute;top:22px;left:22px;right:22px;height:2px;background:linear-gradient(to right,#2563eb,#0891b2,#22c55e);z-index:0}
+.roadmap-phase{flex:1;position:relative;z-index:1;text-align:center;padding:0 8px}
+.roadmap-dot{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin:0 auto 12px;border:3px solid white}
+.roadmap-dot.short{background:#eff6ff;color:#2563eb;box-shadow:0 0 0 3px #2563eb}
+.roadmap-dot.mid{background:#f0fdfa;color:#0891b2;box-shadow:0 0 0 3px #0891b2}
+.roadmap-dot.long{background:#f0fdf4;color:#22c55e;box-shadow:0 0 0 3px #22c55e}
+.roadmap-phase-label{font-size:12px;font-weight:800;margin-bottom:4px}
+.roadmap-phase-period{font-size:11px;color:#94a3b8;margin-bottom:10px}
+.roadmap-items{display:flex;flex-direction:column;gap:4px}
+.roadmap-item{font-size:11.5px;color:#475569;background:white;border-radius:6px;padding:4px 10px;text-align:left;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.roadmap-target{margin-top:10px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;display:inline-block}
+.roadmap-target.short{background:#dbeafe;color:#1d4ed8}
+.roadmap-target.mid{background:#ccfbf1;color:#0f766e}
+.roadmap-target.long{background:#dcfce7;color:#15803d}
+.map-section-hd{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:14px;padding:20px 24px;margin:36px 0 20px}
+.map-section-hd-icon{font-size:28px}
+.map-section-hd-title{font-size:17px;font-weight:800;color:#fff}
+.map-section-hd-sub{font-size:12.5px;color:rgba(255,255,255,0.55);margin-top:2px}
 </style>
 """, unsafe_allow_html=True)
 
@@ -961,522 +1045,572 @@ with tab3:
     """, unsafe_allow_html=True)
 
 
+
 # ═══════════════════════════════════════════════════════════════════════════════
-# TAB 4 : 수질 해석
+# TAB 4 : 수질 해석 (달력형 — 첨부 파일 버전)
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab4:
-    st.markdown('<div class="sec-hd">수질 데이터 심층 해석</div>', unsafe_allow_html=True)
+    # ── 월별 실제 데이터 집계 ─────────────────────────────────────────────────
+    df['month'] = df['date'].dt.month
+    cal_monthly = df.groupby('month').agg(
+        do_ny=('DO_노량진', 'mean'), do_sy=('DO_선유',   'mean'),
+        ph_ny=('pH_노량진', 'mean'), ph_sy=('pH_선유',   'mean'),
+        do_ny_min=('DO_노량진', 'min'), do_sy_min=('DO_선유', 'min'),
+    ).reset_index()
 
-    # expander 제목에서 이모지 제거 → 별도 ins-title로 표시하여 겹침 방지
-    insights = [
-        ("blue",
-         "봄철 pH 급등 — 식물성 플랑크톤 광합성",
-         """<span class="badge b-blue">3–4월</span>
-         두 지점 모두 pH 연중 최고치(노량진 <b>8.3</b>, 선유 <b>8.4</b>)를 기록합니다.
-         수온 상승 → 플랑크톤 폭발 증식 → 광합성으로 CO₂ 소비 →
-         탄산(H₂CO₃) 감소 → 수소이온 농도 하락 → pH 상승의 연쇄입니다.
-         봄철 오후 14–18시에 일중 pH 편차가 최대 <b>1.0 이상</b> 벌어지는 것도 같은 원리입니다."""),
+    t4_station = st.radio(
+        "기준 측정소", ["노량진", "선유", "두 지점 평균"],
+        horizontal=True, key="t4_station"
+    )
 
-        ("red",
-         "여름철 DO 위기 — 수생태계 스트레스 구간",
-         """<span class="badge b-red">5월 말 – 9월</span>
-         노량진 6월 평균 DO <b>5.95 mg/L</b>, 선유 <b>5.51 mg/L</b>로 급락합니다.
-         순간 최솟값은 노량진 <b>2.1 mg/L</b>, 선유 <b>2.0 mg/L</b>까지 떨어졌습니다.<br><br>
-         <b>원인 ①</b> 수온 상승 → 산소 용해도 감소 (20°C: 9.1 → 30°C: 7.5 mg/L)<br>
-         <b>원인 ②</b> 봄 플랑크톤 사체 분해 → 박테리아 대량 산소 소비<br><br>
-         환경부 생물생존 최소 기준 <b>5 mg/L</b>에 근접하거나 하회하는 시간대가 발생하며
-         민감 어종(쏘가리·참마자·버들치)에게 생존 스트레스가 생길 수 있습니다."""),
+    def get_do(row):
+        if t4_station == "노량진": return row['do_ny']
+        elif t4_station == "선유": return row['do_sy']
+        else: return (row['do_ny'] + row['do_sy']) / 2
 
-        ("green",
-         "겨울철 DO 최고치 — 차가운 물의 산소 포화",
-         """<span class="badge b-green">11–12월</span>
-         노량진 12월 평균 <b>11.17 mg/L</b>, 선유 <b>10.91 mg/L</b>.
-         수온이 낮을수록 기체 용해도가 높아져 DO가 최고치입니다.
-         동시에 pH도 7.4–7.5로 중성에 가까워 수생태계 관점에서 가장 쾌적한 환경입니다."""),
+    def get_ph(row):
+        if t4_station == "노량진": return row['ph_ny']
+        elif t4_station == "선유": return row['ph_sy']
+        else: return (row['ph_ny'] + row['ph_sy']) / 2
 
-        ("orange",
-         "노량진 vs 선유 — 공간적 수질 차이",
-         """선유는 노량진에 비해 계절 변동폭이 큽니다
-         (pH 연간 범위 <b>1.8</b> vs <b>1.5</b>).
-         선유는 하류 방향으로 유속이 느리고 유기물이 많아 분해에 의한 DO 소비가 더 큽니다.<br><br>
-         <span class="badge b-orange">주의</span>
-         선유 8월 유효 측정치 424건(정상 730건의 58%)으로 대폭 감소합니다.
-         센서 이상·유지 보수 또는 수질 악화로 인한 장비 오류 가능성이 있어 해석 시 주의가 필요합니다."""),
+    def do_grade_color(v):
+        if v >= 7.5:   return "#22c55e", "#dcfce7", "🟢 1등급",   100
+        elif v >= 5.0: return "#f59e0b", "#fef3c7", "🟡 2~3등급", int((v-5)/2.5*100)
+        elif v >= 2.0: return "#f97316", "#ffedd5", "🟠 4등급",   int((v-2)/3*100)
+        else:           return "#ef4444", "#fee2e2", "🔴 5등급↓",  10
 
-        ("purple",
-         "환경부 수질 등급 평가",
-         """<table class="grade-table">
-           <tr><th>등급</th><th>pH</th><th>DO (mg/L)</th><th>용도</th><th>2020 한강</th></tr>
-           <tr><td><span class="badge b-blue">1등급 (매우 좋음)</span></td>
-               <td>6.5–8.5</td><td>≥ 7.5</td><td>상수원·자연보전</td><td>10–4월 ✓</td></tr>
-           <tr><td><span class="badge b-green">2등급 (좋음)</span></td>
-               <td>6.5–8.5</td><td>≥ 5.0</td><td>1급 정수처리</td><td>봄·가을 해당</td></tr>
-           <tr><td><span class="badge b-orange">3등급 (보통)</span></td>
-               <td>6.5–8.5</td><td>≥ 5.0</td><td>농업·수산용수</td><td>여름 경계</td></tr>
-           <tr><td><span class="badge b-red">4등급 이하</span></td>
-               <td>6.0–8.5</td><td>≥ 2.0</td><td>공업용수</td><td>6월 순간값</td></tr>
-         </table><br>
-         <b>결론:</b> 연간 평균은 2~3등급 수준이나, 여름 DO 급락 구간에서 4등급 경계까지 악화됩니다.
-         연간 수질 관리의 핵심 과제는 <b>5~9월 DO 하락 억제</b>입니다."""),
-    ]
+    def ph_color(v):
+        if 7.0 <= v <= 8.0: return "#2563eb"
+        elif v > 8.0:        return "#7c3aed"
+        else:                return "#dc2626"
 
-    for color, title, body in insights:
-        # 이모지 없이 순수 텍스트 제목만 expander에 사용 → 겹침 방지
-        with st.expander(title):
-            st.markdown(f'<div class="ins-body">{body}</div>', unsafe_allow_html=True)
+    MONTH_NAMES = ['','JAN','FEB','MAR','APR','MAY','JUN',
+                   'JUL','AUG','SEP','OCT','NOV','DEC']
+    MONTH_KO    = ['','1월','2월','3월','4월','5월','6월',
+                   '7월','8월','9월','10월','11월','12월']
+    EVENTS = {
+        1:  ("❄️ DO 최고",   "#dbeafe","#1d4ed8"),
+        2:  ("❄️ DO 안정",   "#dbeafe","#1d4ed8"),
+        3:  ("🌸 pH 급등",   "#fae8ff","#9333ea"),
+        4:  ("🌸 pH 최고",   "#fae8ff","#9333ea"),
+        5:  ("⚠️ DO 하락",   "#fef3c7","#b45309"),
+        6:  ("🚨 DO 위기",   "#fee2e2","#dc2626"),
+        7:  ("🚨 DO 최저",   "#fee2e2","#dc2626"),
+        8:  ("🚨 센서 결측", "#fee2e2","#dc2626"),
+        9:  ("🍂 DO 회복",   "#ffedd5","#c2410c"),
+        10: ("✅ 1등급",      "#dcfce7","#15803d"),
+        11: ("✅ 최적 환경", "#dcfce7","#15803d"),
+        12: ("❄️ DO 최고치", "#dbeafe","#1d4ed8"),
+    }
+    do_max = 12.5
 
+    # ── 달력 HTML 생성 ────────────────────────────────────────────────────────
+    cal_html = '<div class="cal-wrap">'
+    cal_html += f"""
+    <div class="cal-header">
+        <div>
+            <div class="cal-header-title">📅 2020 한강 수질 월별 달력</div>
+            <div class="cal-header-sub">기준 측정소: {t4_station} · pH 및 DO(mg/L) 월평균</div>
+        </div>
+        <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#22c55e"></div>1등급 ≥7.5</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#f59e0b"></div>2~3등급 ≥5.0</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#f97316"></div>4등급 ≥2.0</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#ef4444"></div>5등급↓</div>
+        </div>
+    </div>
+    <div class="cal-grid">"""
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# TAB 5 : 미래 예측 (2030 · 2040 · 2050)
-# ═══════════════════════════════════════════════════════════════════════════════
-with tab5:
-    st.markdown('<div class="sec-hd">2026–2050 수질 예측 (기후변화 시나리오)</div>',
-                unsafe_allow_html=True)
+    for _, row in cal_monthly.iterrows():
+        m = int(row['month'])
+        do_v = get_do(row)
+        ph_v = get_ph(row)
+        do_col, do_bg, grade_label, bar_pct = do_grade_color(do_v)
+        ph_col = ph_color(ph_v)
+        ev_label, ev_bg, ev_col = EVENTS.get(m, ("", "#f3f4f6", "#64748b"))
+        bar_w = int(do_v / do_max * 100)
+        cal_html += f"""
+        <div class="cal-month">
+            <div class="cal-month-name">{MONTH_NAMES[m]} · {MONTH_KO[m]}</div>
+            <div class="cal-vals">
+                <div class="cal-val-row">
+                    <span class="cal-val-label">DO</span>
+                    <span><span class="cal-val-num" style="color:{do_col}">{do_v:.2f}</span><span class="cal-val-unit">mg/L</span></span>
+                </div>
+                <div class="cal-do-bar-wrap"><div class="cal-do-bar" style="width:{bar_w}%;background:{do_col}"></div></div>
+                <div class="cal-val-row">
+                    <span class="cal-val-label">pH</span>
+                    <span><span class="cal-val-num" style="color:{ph_col}">{ph_v:.2f}</span></span>
+                </div>
+            </div>
+            <span class="cal-tag" style="background:{ev_bg};color:{ev_col}">{ev_label}</span>
+        </div>"""
 
+    cal_html += '</div></div>'
+    st.markdown(cal_html, unsafe_allow_html=True)
+
+    # ── 계절별 인사이트 ────────────────────────────────────────────────────────
+    st.markdown('<div class="sec-hd">계절별 수질 해석</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div class="warn-box">
-    ⚠️ <b>예측 모델 안내</b>: 2020년 실측 데이터를 기반으로 기후변화 시나리오(IPCC SSP2-4.5, SSP5-8.5)를
-    적용한 통계적 외삽 모델입니다. 실제 수질은 정책·인프라·강수량 변동에 따라 달라질 수 있습니다.
+    <div class="cal-insight-grid">
+        <div class="cal-insight-card spring">
+            <div class="cal-insight-title">🌸 봄 (3–5월) — pH 급등 구간</div>
+            <div class="cal-insight-body">수온 상승 → 플랑크톤 폭발 증식 → 광합성 왕성 → CO₂ 소비 → pH 상승의 연쇄.
+            노량진 <b>8.3</b>, 선유 <b>8.4</b>로 연중 최고치를 기록합니다.
+            봄철 오후 14–18시에 일중 pH 편차가 최대 <b>1.0 이상</b> 벌어집니다.</div>
+        </div>
+        <div class="cal-insight-card summer">
+            <div class="cal-insight-title">☀️ 여름 (6–8월) — DO 위기 구간</div>
+            <div class="cal-insight-body">노량진 6월 평균 DO <b>5.95 mg/L</b>, 선유 <b>5.51 mg/L</b>로 급락.
+            순간 최솟값 노량진 <b>2.1</b>, 선유 <b>2.0 mg/L</b>.
+            수온 상승 → 산소 용해도 감소(20°C: 9.1 → 30°C: 7.5 mg/L).
+            플랑크톤 사체 분해 시 박테리아 대량 산소 소비가 복합적으로 작용합니다.
+            8월 선유 센서 결측률 <b>58%</b> 주의.</div>
+        </div>
+        <div class="cal-insight-card autumn">
+            <div class="cal-insight-title">🍂 가을 (9–10월) — 회복 구간</div>
+            <div class="cal-insight-body">수온 하강 → DO 서서히 회복. 10월부터 DO ≥ 7.5 mg/L 달성,
+            환경부 <b>1등급</b> 수준으로 회복됩니다.
+            pH도 7.4–7.5로 중성 범위에 안정되며 수생태계에 쾌적한 환경입니다.</div>
+        </div>
+        <div class="cal-insight-card winter">
+            <div class="cal-insight-title">❄️ 겨울 (11–12월) — DO 최고 구간</div>
+            <div class="cal-insight-body">노량진 12월 평균 <b>11.17 mg/L</b>, 선유 <b>10.91 mg/L</b>로 연중 최고.
+            저수온일수록 기체 용해도가 높아져 DO가 포화 상태를 유지합니다.
+            pH는 7.4–7.5로 가장 안정적이며, 연중 수질이 가장 쾌적한 시기입니다.</div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-    SCENARIOS = {
-        'SSP2-4.5 (중위 시나리오)': {
-            'dash': 'solid', 'temp_2050': 1.5,
-            'do_per_c': 0.20, 'summer_penalty': 0.08, 'ph_per_yr': -0.002,
-        },
-        'SSP5-8.5 (고위 시나리오)': {
-            'dash': 'dash', 'temp_2050': 3.0,
-            'do_per_c': 0.22, 'summer_penalty': 0.18, 'ph_per_yr': -0.005,
-        },
-    }
-    BASE = {'do_ny': 8.463, 'do_sy': 8.260, 'ph_ny': 7.287, 'ph_sy': 7.317}
-    future_years = np.arange(2020, 2051)
-
-    def forecast(base, sc, kind='do'):
-        vals, noises = [], []
-        for y in future_years:
-            n, frac = y - 2020, (y - 2020) / 30
-            if kind == 'do':
-                val = base - sc['do_per_c'] * sc['temp_2050'] * frac - sc['summer_penalty'] * frac
-                noise = 0.3 + 0.5 * frac
-            else:
-                val = base + sc['ph_per_yr'] * n
-                noise = 0.05 + 0.1 * frac
-            vals.append(val); noises.append(noise)
-        return np.array(vals), np.array(noises)
-
-    def make_band(years, vals, noise, hex_color, label):
-        r,g,b = int(hex_color[1:3],16), int(hex_color[3:5],16), int(hex_color[5:7],16)
-        band = go.Scatter(
-            x=list(years)+list(years[::-1]),
-            y=list(vals+noise)+list((vals-noise)[::-1]),
-            fill='toself', fillcolor=f'rgba({r},{g},{b},0.10)',
-            line=dict(color='rgba(255,255,255,0)'), showlegend=False, name=f'{label} 불확실도')
-        line = go.Scatter(x=years, y=np.round(vals,3), name=f'{label} 예측', mode='lines',
-                          line=dict(color=hex_color, width=2.2))
-        return band, line
-
-    sc_name = st.selectbox("시나리오 선택", list(SCENARIOS.keys()), key='sc_sel')
-    sc = SCENARIOS[sc_name]
-    sc['dash']  # ensure key exists
-
-    do_ny_v, do_ny_n = forecast(BASE['do_ny'], sc, 'do')
-    do_sy_v, do_sy_n = forecast(BASE['do_sy'], sc, 'do')
-    ph_ny_v, ph_ny_n = forecast(BASE['ph_ny'], sc, 'ph')
-    ph_sy_v, ph_sy_n = forecast(BASE['ph_sy'], sc, 'ph')
-
-    # ── 연도별 비교 강조 (2030 / 2040 / 2050) ─────────────────────────────
-    st.markdown('<div class="sec-hd">2030 · 2040 · 2050 예측 수치 한눈에 보기</div>',
-                unsafe_allow_html=True)
-
-    highlight_years = [2026, 2030, 2040, 2050]
-    h_idxs = [y - 2020 for y in highlight_years]
-
-    col_cards = st.columns(4)
-    status_emoji = {True: '🚨', False: ''}
-    for i, (yr, idx) in enumerate(zip(highlight_years, h_idxs)):
-        do_n = do_ny_v[idx]; do_s = do_sy_v[idx]
-        ph_n = ph_ny_v[idx]; ph_s = ph_sy_v[idx]
-        warn = do_n < 6.0 or do_s < 6.0
-        danger = do_n < 5.0 or do_s < 5.0
-        state = '🚨 위험' if danger else ('⚠️ 주의' if warn else '✅ 양호')
-        top_color = '#dc2626' if danger else ('#f97316' if warn else '#22c55e')
-        with col_cards[i]:
+    # ── 환경부 등급 요약 ──────────────────────────────────────────────────────
+    st.markdown('<div class="sec-hd" style="margin-top:24px">환경부 수질 등급 기준 대조</div>', unsafe_allow_html=True)
+    grade_cols = st.columns(4)
+    grades = [
+        ("🟢 1등급","매우 좋음","DO ≥ 7.5","pH 6.5–8.5","상수원·자연보전","10월–4월","#dcfce7","#15803d"),
+        ("🟡 2~3등급","좋음·보통","DO ≥ 5.0","pH 6.5–8.5","정수처리·농업용수","봄·가을","#fef3c7","#b45309"),
+        ("🟠 4등급","나쁨","DO ≥ 2.0","pH 6.0–8.5","공업용수","여름 순간값","#ffedd5","#c2410c"),
+        ("🔴 5등급↓","매우 나쁨","DO < 2.0","pH <6.0 or >8.5","용도 제한","극한 상황","#fee2e2","#b91c1c"),
+    ]
+    for col, (grade, status, do_crit, ph_crit, use, when, bg, fc) in zip(grade_cols, grades):
+        with col:
             st.markdown(f"""
-            <div style="background:#fff; border-radius:14px; padding:18px 16px;
-                        box-shadow:0 2px 8px rgba(0,0,0,0.07);
-                        border-top:3px solid {top_color}; text-align:center;">
-              <div style="font-size:22px; font-weight:900; color:#0c1e3c; margin-bottom:4px;">{yr}년</div>
-              <div style="font-size:12px; color:#6b7280; margin-bottom:12px; font-weight:500;">{state}</div>
-              <div style="font-size:12px; color:#374151; line-height:1.9; text-align:left;">
-                DO 노량진 <b>{do_n:.2f}</b> mg/L<br>
-                DO 선유&nbsp;&nbsp;&nbsp;<b>{do_s:.2f}</b> mg/L<br>
-                pH 노량진 <b>{ph_n:.3f}</b><br>
-                pH 선유&nbsp;&nbsp;&nbsp;<b>{ph_s:.3f}</b>
-              </div>
+            <div style="background:{bg};border-radius:12px;padding:16px 18px">
+                <div style="font-size:16px;font-weight:900;color:{fc};margin-bottom:4px">{grade}</div>
+                <div style="font-size:11px;font-weight:700;color:{fc};margin-bottom:10px;opacity:0.8">{status}</div>
+                <div style="font-size:12px;color:#374151;line-height:1.8">
+                    <b>DO:</b> {do_crit}<br><b>pH:</b> {ph_crit}<br>
+                    <b>용도:</b> {use}<br><b>2020 한강:</b> {when}
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
 
-    # ── 예측 그래프 ───────────────────────────────────────────────────────────
-    pred_tabs = st.tabs(["용존산소 (DO) 예측", "수소이온농도 (pH) 예측"])
 
-    def add_milestone_lines(fig, years_list, vals_list, labels, row=None):
-        """2030·2040·2050 수직선 + 값 주석"""
-        for yr, val, lbl in zip(years_list, vals_list, labels):
-            kw = dict(x=yr, line_dash='dot', line_color='rgba(100,100,100,0.4)',
-                      annotation_text=lbl, annotation_font_size=10,
-                      annotation_font_color='#6b7280')
-            if row:
-                fig.add_vline(**kw, row=row, col=1)
+# ═══════════════════════════════════════════════════════════════════════════════
+# TAB 5 : 미래 예측 (슬라이드형 — 첨부 파일 버전)
+# ═══════════════════════════════════════════════════════════════════════════════
+with tab5:
+    import json
+    import numpy as np
+    import streamlit.components.v1 as components
+
+    SCENARIOS = {
+        'SSP2-4.5': {'temp_2050': 1.5, 'do_per_c': 0.20, 'summer_penalty': 0.08, 'ph_per_yr': -0.002},
+        'SSP5-8.5': {'temp_2050': 3.0, 'do_per_c': 0.22, 'summer_penalty': 0.18, 'ph_per_yr': -0.005},
+    }
+    BASE = {'do_ny': 8.463, 'do_sy': 8.260, 'ph_ny': 7.287, 'ph_sy': 7.317}
+    future_years_arr = list(range(2020, 2051))
+
+    def forecast(base, sc, kind='do'):
+        vals = []
+        for y in future_years_arr:
+            frac = (y - 2020) / 30
+            if kind == 'do':
+                val = base - sc['do_per_c'] * sc['temp_2050'] * frac - sc['summer_penalty'] * frac
             else:
-                fig.add_vline(**kw)
+                val = base + sc['ph_per_yr'] * (y - 2020)
+            vals.append(round(val, 3))
+        return vals
 
-    milestone_yrs  = [2030, 2040, 2050]
-    milestone_lbls = ['2030', '2040', '2050']
+    sc245 = SCENARIOS['SSP2-4.5']; sc585 = SCENARIOS['SSP5-8.5']
+    do_ny_245 = forecast(BASE['do_ny'], sc245, 'do')
+    do_sy_245 = forecast(BASE['do_sy'], sc245, 'do')
+    ph_ny_245 = forecast(BASE['ph_ny'], sc245, 'ph')
+    ph_sy_245 = forecast(BASE['ph_sy'], sc245, 'ph')
+    do_ny_585 = forecast(BASE['do_ny'], sc585, 'do')
+    do_sy_585 = forecast(BASE['do_sy'], sc585, 'do')
+    ph_ny_585 = forecast(BASE['ph_ny'], sc585, 'ph')
+    ph_sy_585 = forecast(BASE['ph_sy'], sc585, 'ph')
 
-    with pred_tabs[0]:
-        fig_f = go.Figure()
-        b1,l1 = make_band(future_years, do_ny_v, do_ny_n, '#2563eb', '노량진')
-        b2,l2 = make_band(future_years, do_sy_v, do_sy_n, '#d97706', '선유')
-        fig_f.add_traces([b1,b2,l1,l2])
-        fig_f.add_trace(go.Scatter(x=[2020],y=[BASE['do_ny']],mode='markers',
-                                   name='노량진 실측(2020)',marker=dict(color='#2563eb',size=10)))
-        fig_f.add_trace(go.Scatter(x=[2020],y=[BASE['do_sy']],mode='markers',
-                                   name='선유 실측(2020)',marker=dict(color='#d97706',size=10)))
-        # 2030·2040·2050 마커
-        for yr in milestone_yrs:
-            idx = yr - 2020
-            fig_f.add_trace(go.Scatter(
-                x=[yr,yr], y=[do_ny_v[idx], do_sy_v[idx]], mode='markers+text',
-                marker=dict(color=['#2563eb','#d97706'], size=10, symbol='diamond'),
-                text=[f"{do_ny_v[idx]:.2f}", f"{do_sy_v[idx]:.2f}"],
-                textposition='top center', textfont=dict(size=10),
-                showlegend=False, name=f'{yr}년'))
-        fig_f.add_hline(y=5.0,line_dash='dot',line_color='#dc2626',
-                        annotation_text='수생태계 위험 하한 5.0',annotation_font_color='#dc2626')
-        fig_f.add_hline(y=7.5,line_dash='dot',line_color='#16a34a',
-                        annotation_text='1등급 기준 7.5',annotation_font_color='#16a34a')
-        fig_f.add_vline(x=2026,line_dash='dot',line_color='#6b7280',
-                        annotation_text='현재(2026)',annotation_font_size=11)
-        for yr in milestone_yrs:
-            fig_f.add_vline(x=yr,line_dash='dot',line_color='rgba(150,150,150,0.3)',
-                            annotation_text=str(yr),annotation_font_size=10,
-                            annotation_font_color='#9ca3af')
-        fig_f.update_layout(
-            height=440, plot_bgcolor='white', paper_bgcolor='white',
-            margin=dict(l=10,r=10,t=10,b=10),
-            xaxis=dict(title='연도',showgrid=True,gridcolor='#f3f4f6'),
-            yaxis=dict(title='DO (mg/L)',range=[3.0,13.0],showgrid=True,gridcolor='#f3f4f6'),
-            legend=dict(orientation='h',y=1.06,xanchor='right',x=1))
-        st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
-        st.plotly_chart(fig_f, use_container_width=True, config={'displaylogo': False})
-        st.markdown('</div>', unsafe_allow_html=True)
+    KEY_YEARS  = [2026, 2030, 2040, 2050]
+    KEY_LABELS = ["현재", "단기 목표", "중기 전환점", "장기 목표"]
+    KEY_DESCS  = [
+        "기후변화 영향이 서서히 시작되는 시점",
+        "단기 정책(폭기·모니터링) 효과가 나타나는 시점",
+        "하수처리장 고도화·생태습지 정책 완료 후의 수질",
+        "기후변화 대응 정책의 최종 성과가 결정되는 시점",
+    ]
+    KEY_ICONS = ["📍", "⚡", "🔧", "🌍"]
 
-    with pred_tabs[1]:
-        fig_fp = go.Figure()
-        b3,l3 = make_band(future_years, ph_ny_v, ph_ny_n, '#2563eb', '노량진')
-        b4,l4 = make_band(future_years, ph_sy_v, ph_sy_n, '#d97706', '선유')
-        fig_fp.add_traces([b3,b4,l3,l4])
-        fig_fp.add_trace(go.Scatter(x=[2020],y=[BASE['ph_ny']],mode='markers',
-                                    name='노량진 실측(2020)',marker=dict(color='#2563eb',size=10)))
-        fig_fp.add_trace(go.Scatter(x=[2020],y=[BASE['ph_sy']],mode='markers',
-                                    name='선유 실측(2020)',marker=dict(color='#d97706',size=10)))
-        for yr in milestone_yrs:
-            idx = yr - 2020
-            fig_fp.add_trace(go.Scatter(
-                x=[yr,yr], y=[ph_ny_v[idx], ph_sy_v[idx]], mode='markers+text',
-                marker=dict(color=['#2563eb','#d97706'], size=10, symbol='diamond'),
-                text=[f"{ph_ny_v[idx]:.3f}", f"{ph_sy_v[idx]:.3f}"],
-                textposition='top center', textfont=dict(size=10),
-                showlegend=False, name=f'{yr}년'))
-        fig_fp.add_hline(y=6.5,line_dash='dot',line_color='#dc2626',annotation_text='환경부 하한 6.5')
-        fig_fp.add_hline(y=8.5,line_dash='dot',line_color='gray',annotation_text='환경부 상한 8.5')
-        fig_fp.add_vline(x=2026,line_dash='dot',line_color='#6b7280',
-                         annotation_text='현재(2026)',annotation_font_size=11)
-        for yr in milestone_yrs:
-            fig_fp.add_vline(x=yr,line_dash='dot',line_color='rgba(150,150,150,0.3)',
-                             annotation_text=str(yr),annotation_font_size=10,
-                             annotation_font_color='#9ca3af')
-        fig_fp.update_layout(
-            height=440, plot_bgcolor='white', paper_bgcolor='white',
-            margin=dict(l=10,r=10,t=10,b=10),
-            xaxis=dict(title='연도',showgrid=True,gridcolor='#f3f4f6'),
-            yaxis=dict(title='pH',range=[6.0,9.0],showgrid=True,gridcolor='#f3f4f6'),
-            legend=dict(orientation='h',y=1.06,xanchor='right',x=1))
-        st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
-        st.plotly_chart(fig_fp, use_container_width=True, config={'displaylogo': False})
-        st.markdown('</div>', unsafe_allow_html=True)
+    slides_data = []
+    for i, yr in enumerate(KEY_YEARS):
+        idx = yr - 2020
+        v245n = do_ny_245[idx]; v245s = do_sy_245[idx]
+        v585n = do_ny_585[idx]; v585s = do_sy_585[idx]
+        p245n = ph_ny_245[idx]; p245s = ph_sy_245[idx]
+        p585n = ph_ny_585[idx]; p585s = ph_sy_585[idx]
+        dn245 = v245n - BASE['do_ny']; dn585 = v585n - BASE['do_ny']
 
-    # 전체 연도표
-    st.markdown('<div class="sec-hd">전체 연도별 예측 수치표</div>', unsafe_allow_html=True)
-    all_miles = [2026, 2030, 2035, 2040, 2045, 2050]
-    all_idxs  = [y - 2020 for y in all_miles]
-    pred_tbl = pd.DataFrame({
-        '연도': all_miles,
-        'DO 노량진 (mg/L)': [f"{do_ny_v[i]:.2f}" for i in all_idxs],
-        'DO 선유 (mg/L)':   [f"{do_sy_v[i]:.2f}" for i in all_idxs],
-        'pH 노량진':         [f"{ph_ny_v[i]:.3f}" for i in all_idxs],
-        'pH 선유':           [f"{ph_sy_v[i]:.3f}" for i in all_idxs],
-        '수생태계 상태': [
-            '🚨 위험' if do_ny_v[i]<5.0 or do_sy_v[i]<5.0
-            else ('⚠️ 주의' if do_ny_v[i]<6.5 or do_sy_v[i]<6.5 else '✅ 양호')
-            for i in all_idxs
-        ],
-    })
-    st.dataframe(pred_tbl, use_container_width=True, hide_index=True)
+        def grade(v):
+            if v >= 7.5: return "#22c55e"
+            elif v >= 5.0: return "#f59e0b"
+            elif v >= 2.0: return "#f97316"
+            else: return "#ef4444"
 
-    # 시나리오 해설
-    st.markdown('<div class="sec-hd">시나리오 해설</div>', unsafe_allow_html=True)
-    ca, cb = st.columns(2)
-    with ca:
-        st.markdown("""
-        <div class="ins-card blue">
-          <div class="ins-title">SSP2-4.5 — 중위 시나리오</div>
-          <div class="ins-body">
-            온실가스 감축 정책 지속 경로. 2050년 기온 <b>+1.5°C</b> 상승 예상.<br><br>
-            2030: DO 노량진 ~8.1, 선유 ~7.9 mg/L<br>
-            2040: DO 노량진 ~7.7, 선유 ~7.5 mg/L<br>
-            2050: DO 노량진 ~7.3, 선유 ~7.1 mg/L<br><br>
-            1등급 유지 기간: 연중 50% → 40%로 축소 예상
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
-    with cb:
-        st.markdown("""
-        <div class="ins-card red">
-          <div class="ins-title">SSP5-8.5 — 고위 시나리오</div>
-          <div class="ins-body">
-            현재 추세 지속 최악 경로. 2050년 기온 <b>+3.0°C</b> 상승 예상.<br><br>
-            2030: DO 노량진 ~7.7, 선유 ~7.5 mg/L<br>
-            2040: DO 노량진 ~7.1, 선유 ~6.9 mg/L<br>
-            2050: DO 노량진 ~6.5, 선유 ~6.3 mg/L<br><br>
-            민감 어종 서식 기간: 8개월 → <b>5개월 미만</b> 가능성
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        warn_v = min(v245n, v585n)
+        if warn_v < 5.0:   state="🚨 위험 임박"; sc_key="danger"; sc_color="#dc2626"
+        elif warn_v < 6.5: state="⚠️ 주의 필요"; sc_key="caution"; sc_color="#d97706"
+        else:               state="✅ 양호";       sc_key="ok";      sc_color="#16a34a"
+
+        warn_msgs = {
+            "ok":      f"✅ {yr}년 DO는 두 시나리오 모두 안전 범위(5.0 mg/L)를 유지합니다.",
+            "caution": f"⚠️ {yr}년 일부 시나리오에서 DO가 경계 수준(6.5 mg/L)에 근접합니다.",
+            "danger":  f"🚨 {yr}년 SSP5-8.5에서 DO가 위험 임계치(5.0 mg/L)에 근접합니다.",
+        }
+        slides_data.append({
+            "year": yr, "label": KEY_LABELS[i], "desc": KEY_DESCS[i], "icon": KEY_ICONS[i],
+            "state": state, "state_color": sc_color, "warn_cls": sc_key,
+            "warn_msg": warn_msgs[sc_key],
+            "v245n": v245n, "v245s": v245s, "p245n": p245n, "p245s": p245s,
+            "v585n": v585n, "v585s": v585s, "p585n": p585n, "p585s": p585s,
+            "dn245": dn245, "dn585": dn585,
+            "c245n": grade(v245n), "c245s": grade(v245s),
+            "c585n": grade(v585n), "c585s": grade(v585s),
+            "bar245n": int(v245n/12.5*100), "bar245s": int(v245s/12.5*100),
+            "bar585n": int(v585n/12.5*100), "bar585s": int(v585s/12.5*100),
+        })
+
+    slides_json = json.dumps(slides_data, ensure_ascii=False)
+
+    components.html(f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif}}
+body{{background:#f8fafc;padding:16px}}
+.ctrl{{display:flex;gap:10px;align-items:center;margin-bottom:14px}}
+.ap-btn{{padding:8px 20px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all 0.2s;background:#2563eb;color:white}}
+.ap-btn.playing{{background:#dc2626}}
+.scen-sel{{padding:7px 12px;border-radius:8px;border:1px solid #e2e8f0;font-size:13px;font-weight:600;color:#374151;background:white;cursor:pointer}}
+.step-info{{margin-left:auto;font-size:12px;color:#94a3b8;font-weight:600}}
+.prog-wrap{{height:4px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-bottom:12px}}
+.prog-bar{{height:100%;background:#2563eb;border-radius:99px;width:0%}}
+.timeline{{background:#0c1e3c;border-radius:14px 14px 0 0;padding:16px 24px;display:flex;align-items:center}}
+.tl-step{{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}}
+.tl-step:not(:last-child)::after{{content:'';position:absolute;top:13px;left:50%;width:100%;height:2px;background:rgba(255,255,255,0.15);z-index:0}}
+.tl-dot{{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;position:relative;z-index:1;border:2px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);transition:all 0.4s ease}}
+.tl-dot.active{{background:#2563eb;border-color:#60a5fa;color:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.4)}}
+.tl-dot.passed{{background:#1e3a8a;border-color:#3b82f6;color:#93c5fd}}
+.tl-lbl{{font-size:10px;color:rgba(255,255,255,0.35);margin-top:5px;font-weight:700;transition:color 0.4s}}
+.tl-lbl.active{{color:#93c5fd}}.tl-lbl.passed{{color:rgba(255,255,255,0.6)}}
+.slide-wrap{{background:white;border-radius:0 0 14px 14px;padding:24px 28px;min-height:260px;position:relative;overflow:hidden}}
+.slide{{position:absolute;top:24px;left:28px;right:28px;opacity:0;transform:translateX(40px);transition:opacity 0.5s ease,transform 0.5s ease;pointer-events:none}}
+.slide.active{{opacity:1;transform:translateX(0);pointer-events:auto;position:relative;top:auto;left:auto;right:auto}}
+.yr-hd{{display:flex;align-items:flex-end;gap:14px;margin-bottom:8px}}
+.yr-num{{font-size:52px;font-weight:900;letter-spacing:-2px;color:#0c1e3c;line-height:1}}
+.yr-sub{{padding-bottom:6px}}
+.yr-lbl{{font-size:10px;font-weight:800;letter-spacing:.12em;color:#94a3b8;text-transform:uppercase;margin-bottom:3px}}
+.yr-state{{font-size:15px;font-weight:800}}
+.yr-desc{{font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.7}}
+.metrics{{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}}
+.mcard{{background:#f8fafc;border-radius:12px;padding:16px 18px;border:1px solid #f1f5f9}}
+.mcard-top{{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}}
+.mcard-title{{font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#94a3b8;text-transform:uppercase}}
+.mbadge{{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}}
+.mrow{{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}}
+.mstation{{font-size:12px;color:#64748b;font-weight:600}}
+.mval{{font-size:20px;font-weight:900;line-height:1}}
+.munit{{font-size:10px;color:#94a3b8}}
+.mdelta{{font-size:11px;color:#64748b;margin-left:4px}}
+.mbar-w{{height:5px;background:#e2e8f0;border-radius:99px;margin:4px 0 10px;overflow:hidden}}
+.mbar{{height:100%;border-radius:99px;transition:width 0.6s ease}}
+.mph{{font-size:11px;color:#64748b;margin-top:6px}}
+.warn{{border-radius:9px;padding:10px 14px;font-size:13px;font-weight:600;line-height:1.6}}
+.warn.ok{{background:#f0fdf4;color:#166534;border:1px solid #86efac}}
+.warn.caution{{background:#fffbeb;color:#92400e;border:1px solid #fcd34d}}
+.warn.danger{{background:#fff1f2;color:#9f1239;border:1px solid #fda4af}}
+</style></head><body>
+<div class="ctrl">
+  <button class="ap-btn" id="apBtn" onclick="togglePlay()">⏵ 자동재생</button>
+  <select class="scen-sel" id="scenSel" onchange="renderSlide()">
+    <option value="both">양쪽 비교</option>
+    <option value="245">SSP2-4.5</option>
+    <option value="585">SSP5-8.5</option>
+  </select>
+  <span class="step-info" id="stepInfo">1 / 4</span>
+</div>
+<div class="prog-wrap"><div class="prog-bar" id="progBar"></div></div>
+<div class="timeline" id="timeline"></div>
+<div class="slide-wrap" id="slideWrap"></div>
+<script>
+const SLIDES={slides_json};
+let cur=0,playing=false,progInterval=null,progPct=0;
+function togglePlay(){{playing=!playing;const btn=document.getElementById('apBtn');
+  if(playing){{btn.textContent='⏹ 정지';btn.className='ap-btn playing';
+    if(cur>=SLIDES.length-1){{cur=0;goTo(0);}}startProgress();}}
+  else{{btn.textContent='⏵ 자동재생';btn.className='ap-btn';stopProgress();}}}}
+function startProgress(){{progPct=0;const bar=document.getElementById('progBar');
+  bar.style.transition='none';bar.style.width='0%';clearInterval(progInterval);
+  progInterval=setInterval(()=>{{progPct++;bar.style.width=Math.min(progPct,100)+'%';
+    if(progPct>=100){{progPct=0;bar.style.width='0%';nextSlide();}}}},50);}}
+function stopProgress(){{clearInterval(progInterval);progInterval=null;
+  document.getElementById('progBar').style.width='0%';}}
+function nextSlide(){{if(cur<SLIDES.length-1){{goTo(cur+1);}}
+  else{{playing=false;stopProgress();const btn=document.getElementById('apBtn');
+    btn.textContent='⏵ 자동재생';btn.className='ap-btn';}}}}
+function goTo(idx){{cur=idx;renderTimeline();renderSlide();
+  document.getElementById('stepInfo').textContent=(idx+1)+' / '+SLIDES.length;}}
+function renderTimeline(){{const tl=document.getElementById('timeline');
+  tl.innerHTML=SLIDES.map((s,i)=>{{const cls=i===cur?'active':(i<cur?'passed':'');
+    return `<div class="tl-step"><div class="tl-dot ${{cls}}">${{i+1}}</div>
+      <div class="tl-lbl ${{cls}}">${{s.year}}</div></div>`;}}).join('');}}
+function renderSlide(){{const s=SLIDES[cur];const mode=document.getElementById('scenSel').value;
+  const wrap=document.getElementById('slideWrap');let cards='';
+  if(mode==='both'||mode==='245'){{cards+=`<div class="mcard">
+    <div class="mcard-top"><span class="mcard-title">DO · SSP2-4.5</span>
+      <span class="mbadge" style="background:#dbeafe;color:#1d4ed8">중위</span></div>
+    <div class="mrow"><span class="mstation">노량진</span>
+      <span><span class="mval" style="color:${{s.c245n}}">${{s.v245n.toFixed(2)}}</span>
+      <span class="munit"> mg/L</span>
+      <span class="mdelta">(${{s.dn245>=0?'+':''}}${{s.dn245.toFixed(2)}})</span></span></div>
+    <div class="mbar-w"><div class="mbar" style="width:${{s.bar245n}}%;background:${{s.c245n}}"></div></div>
+    <div class="mrow"><span class="mstation">선유</span>
+      <span><span class="mval" style="color:${{s.c245s}}">${{s.v245s.toFixed(2)}}</span><span class="munit"> mg/L</span></span></div>
+    <div class="mbar-w"><div class="mbar" style="width:${{s.bar245s}}%;background:${{s.c245s}}"></div></div>
+    <div class="mph">pH 노량진 <b style="color:#2563eb">${{s.p245n.toFixed(3)}}</b> | 선유 <b style="color:#2563eb">${{s.p245s.toFixed(3)}}</b></div>
+    </div>`;}}
+  if(mode==='both'||mode==='585'){{cards+=`<div class="mcard">
+    <div class="mcard-top"><span class="mcard-title">DO · SSP5-8.5</span>
+      <span class="mbadge" style="background:#fee2e2;color:#b91c1c">고위</span></div>
+    <div class="mrow"><span class="mstation">노량진</span>
+      <span><span class="mval" style="color:${{s.c585n}}">${{s.v585n.toFixed(2)}}</span>
+      <span class="munit"> mg/L</span>
+      <span class="mdelta">(${{s.dn585>=0?'+':''}}${{s.dn585.toFixed(2)}})</span></span></div>
+    <div class="mbar-w"><div class="mbar" style="width:${{s.bar585n}}%;background:${{s.c585n}}"></div></div>
+    <div class="mrow"><span class="mstation">선유</span>
+      <span><span class="mval" style="color:${{s.c585s}}">${{s.v585s.toFixed(2)}}</span><span class="munit"> mg/L</span></span></div>
+    <div class="mbar-w"><div class="mbar" style="width:${{s.bar585s}}%;background:${{s.c585s}}"></div></div>
+    <div class="mph">pH 노량진 <b style="color:#dc2626">${{s.p585n.toFixed(3)}}</b> | 선유 <b style="color:#dc2626">${{s.p585s.toFixed(3)}}</b></div>
+    </div>`;}}
+  wrap.innerHTML=`<div class="slide active">
+    <div class="yr-hd"><div class="yr-num">${{s.year}}</div>
+      <div class="yr-sub"><div class="yr-lbl">IPCC 예측 시점 · ${{s.label}}</div>
+      <div class="yr-state" style="color:${{s.state_color}}">${{s.state}}</div></div></div>
+    <div class="yr-desc">${{s.icon}} ${{s.desc}}</div>
+    <div class="metrics">${{cards}}</div>
+    <div class="warn ${{s.warn_cls}}">${{s.warn_msg}}</div></div>`;}}
+renderTimeline();renderSlide();
+</script></body></html>
+""", height=560)
+
+    st.divider()
+    with st.expander("📈 2020–2050 전체 DO 추이 그래프 보기", expanded=False):
+        future_years_np = np.arange(2020, 2051)
+        fig_full = go.Figure()
+        def make_band(years, vals, hex_color, label):
+            r,g,b = int(hex_color[1:3],16),int(hex_color[3:5],16),int(hex_color[5:7],16)
+            noise = np.array([0.3+0.5*(y-2020)/30 for y in years])
+            v = np.array(vals)
+            band = go.Scatter(x=list(years)+list(years[::-1]),y=list(v+noise)+list((v-noise)[::-1]),
+                              fill='toself',fillcolor=f'rgba({r},{g},{b},0.08)',
+                              line=dict(color='rgba(255,255,255,0)'),showlegend=False)
+            line = go.Scatter(x=years,y=np.round(v,3),name=label,mode='lines',
+                              line=dict(color=hex_color,width=2.2))
+            return band, line
+        b1,l1=make_band(future_years_np,do_ny_245,'#2563eb','노량진 SSP2-4.5')
+        b2,l2=make_band(future_years_np,do_sy_245,'#7dd3fc','선유 SSP2-4.5')
+        b3,l3=make_band(future_years_np,do_ny_585,'#dc2626','노량진 SSP5-8.5')
+        b4,l4=make_band(future_years_np,do_sy_585,'#fca5a5','선유 SSP5-8.5')
+        fig_full.add_traces([b1,b2,b3,b4,l1,l2])
+        l3.update(line_dash='dot'); l4.update(line_dash='dot')
+        fig_full.add_traces([l3,l4])
+        fig_full.add_hline(y=7.5,line_dash='dot',line_color='#16a34a',
+                           annotation_text='1등급 7.5',annotation_font_color='#16a34a',annotation_font_size=10)
+        fig_full.add_hline(y=5.0,line_dash='dot',line_color='#dc2626',
+                           annotation_text='위험 5.0',annotation_font_color='#dc2626',annotation_font_size=10)
+        fig_full.add_vline(x=2026,line_dash='dot',line_color='#94a3b8',
+                           annotation_text='현재(2026)',annotation_font_size=10)
+        fig_full.update_layout(height=360,plot_bgcolor='white',paper_bgcolor='white',
+                               margin=dict(l=10,r=10,t=16,b=10),
+                               xaxis=dict(title='연도',showgrid=True,gridcolor='#f8fafc',
+                                          tickvals=[2020,2026,2030,2040,2050]),
+                               yaxis=dict(title='DO (mg/L)',range=[3.0,13.0],showgrid=True,gridcolor='#f8fafc'),
+                               legend=dict(orientation='h',y=1.06,xanchor='right',x=1,font=dict(size=11)))
+        st.plotly_chart(fig_full,use_container_width=True,config={'displaylogo':False})
+
+    with st.expander("📋 연도별 예측 수치표", expanded=False):
+        all_miles=[2026,2030,2035,2040,2045,2050]
+        all_idxs=[y-2020 for y in all_miles]
+        pred_tbl=pd.DataFrame({
+            '연도':all_miles,
+            'DO 노량진 SSP2-4.5':[f"{do_ny_245[i]:.2f}" for i in all_idxs],
+            'DO 선유 SSP2-4.5':  [f"{do_sy_245[i]:.2f}" for i in all_idxs],
+            'DO 노량진 SSP5-8.5':[f"{do_ny_585[i]:.2f}" for i in all_idxs],
+            'DO 선유 SSP5-8.5':  [f"{do_sy_585[i]:.2f}" for i in all_idxs],
+            '상태':['🚨 위험' if min(do_ny_585[i],do_sy_585[i])<5.0
+                   else ('⚠️ 주의' if min(do_ny_245[i],do_ny_585[i])<6.5 else '✅ 양호')
+                   for i in all_idxs],
+        })
+        st.dataframe(pred_tbl,use_container_width=True,hide_index=True)
 
     st.markdown("""
-    <div class="ins-card purple">
-      <div class="ins-title">예측 모델 방법론 및 한계</div>
-      <div class="ins-body">
-        <b>기준 데이터:</b> 2020년 노량진·선유 시간별 실측값 (n=8,784)<br>
-        <b>DO 예측:</b> Henry's Law (기온–산소 용해도) + 도시 비점오염 증가 보정<br>
-        <b>pH 예측:</b> 대기 CO₂ 농도 증가(420→500–600 ppm) 탄산 평형 계산<br>
-        <b>불확실도:</b> 단기 ±0.3 → 2050년 ±0.8 mg/L로 선형 증가<br><br>
-        <span class="badge b-orange">한계점</span>
-        단일 연도 기반 외삽이므로 장기 정책 효과나 기상 이변은 반영되지 않습니다.
-      </div>
+    <div class="warn-box" style="margin-top:8px">
+    ⚠️ <b>예측 모델 안내</b>: 2020년 실측 데이터 기반 통계 외삽 모델.
+    Henry's Law + 도시 비점오염 보정 적용. 실제 수질은 정책·인프라·강수량에 따라 달라질 수 있습니다.
     </div>
     """, unsafe_allow_html=True)
 
 
+
 # ═══════════════════════════════════════════════════════════════════════════════
-# TAB 6 : 수질 정책
+# TAB 6 : 수질 정책 (카드형 + 지도 — 첨부 파일 버전)
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab6:
-    st.markdown('<div class="sec-hd">한강 수질 개선을 위한 핵심 정책</div>', unsafe_allow_html=True)
+
+    PHASE_STYLES = {
+        "단기": {"pill":"short","accent":"linear-gradient(90deg,#2563eb,#3b82f6)",
+                 "icon_bg":"#eff6ff","effect_color":"#1d4ed8",
+                 "do_chip_bg":"#dbeafe","do_chip_color":"#1d4ed8"},
+        "중기": {"pill":"mid","accent":"linear-gradient(90deg,#059669,#10b981)",
+                 "icon_bg":"#f0fdf4","effect_color":"#059669",
+                 "do_chip_bg":"#dcfce7","do_chip_color":"#15803d"},
+        "장기": {"pill":"long","accent":"linear-gradient(90deg,#7c3aed,#a855f7)",
+                 "icon_bg":"#faf5ff","effect_color":"#7c3aed",
+                 "do_chip_bg":"#f3e8ff","do_chip_color":"#7e22ce"},
+    }
+
+    # ── ① 인트로 배너 ────────────────────────────────────────────────────────
     st.markdown("""
-    <div class="ins-card sky" style="margin-bottom:20px;">
-      <div class="ins-title">왜 정책이 필요한가</div>
-      <div class="ins-body">
-        2020년 실측 데이터는 여름철(5–9월) DO가 수생태계 위험 기준(5 mg/L)에 근접하거나
-        하회하는 구간이 반복됨을 보여줍니다. 기후변화 시나리오(SSP5-8.5)대로 진행될 경우
-        2050년에는 연평균 DO가 6.3–6.5 mg/L까지 떨어져 한강 생태계의 구조적 붕괴가 우려됩니다.
-        자연적 회복력만으로는 한계가 있어 <b>제도적·기술적 개입</b>이 필수적입니다.
-      </div>
+    <div class="policy-intro">
+        <div class="policy-intro-label">Action Plan · 2026 – 2050</div>
+        <div class="policy-intro-title">한강을 지키는<br>6가지 핵심 정책</div>
+        <div class="policy-intro-body">
+            2020년 실측 데이터는 여름철 DO가 수생태계 위험 기준(5 mg/L)에 근접하거나 하회하는 구간이
+            반복됨을 보여줍니다. 기후변화 SSP5-8.5 경로가 지속되면 2050년 한강 생태계의 구조적 붕괴가
+            우려됩니다. 단기 즉각 대응부터 장기 구조 전환까지, 3단계 로드맵이 필요합니다.
+        </div>
+        <div class="policy-intro-stats">
+            <div><div class="policy-intro-stat-val">2.1</div>
+                 <div class="policy-intro-stat-label">mg/L · 2020 여름 DO 최솟값</div></div>
+            <div><div class="policy-intro-stat-val">5.54</div>
+                 <div class="policy-intro-stat-label">mg/L · SSP5-8.5 2050 예측</div></div>
+            <div><div class="policy-intro-stat-val">6개</div>
+                 <div class="policy-intro-stat-label">단계별 핵심 정책</div></div>
+            <div><div class="policy-intro-stat-val">25년</div>
+                 <div class="policy-intro-stat-label">정책 로드맵 기간</div></div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-    policies = [
-        {
-            "color": "blue",
-            "num": "1",
-            "title": "하수처리장 고도화 및 총인(T-P) 저감",
-            "why": """
-                한강으로 유입되는 하수처리수에는 질소·인 등 영양염류가 포함됩니다.
-                이들이 과다하면 <b>조류(藻類) 대발생(녹조)</b>을 유발하고,
-                조류 사체가 분해될 때 막대한 산소를 소비해 DO를 급락시킵니다.
-                2020년 6월 DO 최솟값 2.1 mg/L의 주요 원인 중 하나입니다.
-            """,
-            "what": """
-                하수처리장에 <b>고도처리 공정</b>(A²O, MBR)을 도입해 방류수 총인 농도를
-                0.2 mg/L 이하로 낮춥니다. 서울시는 2030년까지 중랑·탄천 처리장 고도화를
-                완료하는 계획을 추진 중입니다.
-            """,
-            "effect": """
-                총인 50% 감소 시 여름 조류 발생량 30–40% 억제 효과가 보고됩니다.
-                DO 여름 최솟값을 약 <b>+1.0–1.5 mg/L</b> 개선 가능합니다.
-            """
-        },
-        {
-            "color": "green",
-            "num": "2",
-            "title": "비점오염원 관리 — 초기 우수(初期雨水) 처리",
-            "why": """
-                도시 강우 시 도로·주차장·공사장에서 씻겨 내려오는
-                <b>초기 강우 유출수</b>는 오염 농도가 하수와 맞먹습니다.
-                이 비점오염이 여름 장마철 한강 DO를 2차 급락시키는 원인입니다.
-            """,
-            "what": """
-                강변 도로에 <b>초기 우수 저류조</b>를 설치하고,
-                투수성 포장재 확대, 빗물정원(Rain Garden) 조성으로
-                오염된 초기 우수가 직접 한강에 유입되지 않도록 합니다.
-            """,
-            "effect": """
-                강우 후 DO 단기 급락 폭을 <b>30–50% 완충</b>할 수 있습니다.
-                특히 선유 지점(하류·퇴적물 많음)의 여름 최솟값 개선에 효과적입니다.
-            """
-        },
-        {
-            "color": "orange",
-            "num": "3",
-            "title": "한강 인공 산소 공급 — 폭기(曝氣) 시설 운영",
-            "why": """
-                여름 고수온기(수온 26°C 이상)에는 물리적으로 DO 포화 농도 자체가 낮아집니다.
-                생물학적 방법만으로는 즉각적인 대응이 불가능하며,
-                <b>물고기 집단 폐사</b> 등 생태 재난이 발생할 수 있습니다.
-            """,
-            "what": """
-                한강 바닥에 <b>산기관(Air Diffuser)</b>을 설치하거나
-                수중 교반기(Aerator)를 가동해 물에 직접 공기를 불어 넣습니다.
-                서울시는 이미 일부 구간에서 폭기 선박을 운영 중입니다.
-            """,
-            "effect": """
-                폭기 시 해당 구간 DO를 단기간에 <b>2–4 mg/L</b> 높일 수 있습니다.
-                특히 도심 구간(노량진·선유)의 긴급 대응 수단으로 유효합니다.
-            """
-        },
-        {
-            "color": "purple",
-            "num": "4",
-            "title": "한강 생태습지·수변완충구역 확대",
-            "why": """
-                콘크리트로 직선화된 하안은 자정(自淨) 능력이 거의 없습니다.
-                자연 하안에 비해 유기물 정화 속도가 <b>3–5배 느리며</b>,
-                수온도 더 빠르게 오릅니다.
-            """,
-            "what": """
-                한강변에 <b>갈대·부들 등 정수식물</b> 군락을 복원하고
-                수변 완충 녹지대(최소 30m)를 지정합니다.
-                이미 조성된 난지·여의도 생태공원을 추가 확대합니다.
-            """,
-            "effect": """
-                수변 습지는 질소를 연간 최대 <b>500 kg/ha</b> 제거할 수 있습니다.
-                수온을 1–2°C 낮추는 냉각 효과도 있어 DO 포화도 유지에 기여합니다.
-            """
-        },
-        {
-            "color": "teal",
-            "num": "5",
-            "title": "수질 실시간 모니터링 고도화 및 조기경보",
-            "why": """
-                2020년 선유 8월 데이터 결측(58%)이 보여주듯,
-                현재 측정망은 극단적 수질 악화 상황에서 오히려 데이터 공백이 생깁니다.
-                선제적 대응을 위해서는 <b>정밀하고 끊김 없는 측정</b>이 필수입니다.
-            """,
-            "what": """
-                AI 기반 수질 예측 모델과 IoT 실시간 센서망을 결합해
-                DO·pH·수온·조류 농도를 10분 단위로 수집하고,
-                위험 기준 접근 시 자동 경보 발령 체계를 구축합니다.
-            """,
-            "effect": """
-                DO 5 mg/L 하회 <b>6–12시간 전 예측</b>이 가능해져
-                폭기 선박 출동, 취수 조정 등 선제 조치 시간을 확보할 수 있습니다.
-            """
-        },
-        {
-            "color": "red",
-            "num": "6",
-            "title": "기후변화 대응 — 도시 열섬 완화 및 탄소 감축",
-            "why": """
-                한강 수질의 가장 큰 장기 위협은 <b>수온 상승</b>입니다.
-                도시 열섬 효과로 서울 한강 수온은 전국 평균보다 빠르게 오르고 있으며,
-                수온 1°C 상승은 DO 포화 농도를 약 0.2 mg/L 낮춥니다.
-            """,
-            "what": """
-                건물 옥상 녹화, 도시 숲 확대, 바람길 조성으로 도시 열섬을 완화하고
-                탄소 감축을 통해 기온 상승 자체를 억제합니다.
-                한강 수온 모니터링을 기후 정책 지표로 공식 채택합니다.
-            """,
-            "effect": """
-                도시 열섬 1°C 완화 시 여름 한강 수온 <b>0.5–0.8°C 감소</b>,
-                DO 연중 최솟값 <b>+0.1–0.16 mg/L</b> 개선 효과가 기대됩니다.
-                장기적으로는 SSP5-8.5 시나리오를 SSP2-4.5 수준으로 완화하는 핵심 수단입니다.
-            """
-        },
+    # ── ② 정책 카드 — 페이즈별 ──────────────────────────────────────────────
+    phases = [
+        {"key":"단기","label":"단기 집중 대응","period":"2026 – 2030","pill":"short","emoji":"⚡","target":"DO 최솟값 3.0 mg/L 이상 유지"},
+        {"key":"중기","label":"구조적 수질 개선","period":"2031 – 2040","pill":"mid","emoji":"🔧","target":"DO 연평균 8.0 mg/L 이상 유지"},
+        {"key":"장기","label":"기후 구조 전환","period":"2041 – 2050","pill":"long","emoji":"🌍","target":"1등급 수질 연중 60% 이상"},
     ]
-
-    color_map = {
-        'blue':'blue','green':'green','orange':'orange',
-        'purple':'purple','teal':'teal','red':'red'
-    }
-
-    for p in policies:
-        c = p['color']
+    for phase in phases:
+        phase_policies = [p for p in MAP_POLICIES if p["phase"] == phase["key"]]
+        st_obj = PHASE_STYLES[phase["key"]]
+        n = len(phase_policies)
+        grid_class = "pcard-grid" if n == 3 else "pcard-grid two"
         st.markdown(f"""
-        <div class="policy-card {c}">
-          <div class="policy-title">
-            <span class="policy-num {c}">{p['num']}</span>
-            {p['title']}
-          </div>
-          <div class="policy-body">
-            <div class="policy-row">
-              <div class="policy-sub">
-                <div class="policy-sub-title">왜 필요한가</div>
-                <div class="policy-sub-body">{p['why']}</div>
-              </div>
-              <div class="policy-sub">
-                <div class="policy-sub-title">무엇을 하는가</div>
-                <div class="policy-sub-body">{p['what']}</div>
-              </div>
-            </div>
-            <div class="policy-sub" style="margin-top:10px; border-left:3px solid #{'22c55e' if c=='green' else '3b82f6' if c=='blue' else 'f97316' if c=='orange' else 'a855f7' if c=='purple' else '0891b2' if c=='teal' else 'ef4444'};">
-              <div class="policy-sub-title">기대 효과</div>
-              <div class="policy-sub-body">{p['effect']}</div>
-            </div>
-          </div>
+        <div class="phase-header">
+            <span class="phase-pill {st_obj['pill']}">{phase['emoji']} {phase['label']}</span>
+            <span style="font-size:12px;color:#94a3b8;font-weight:600">{phase['period']}</span>
+            <div class="phase-line"></div>
+            <span style="font-size:11.5px;color:#64748b;background:#f1f5f9;
+            padding:4px 12px;border-radius:99px;white-space:nowrap">🎯 {phase['target']}</span>
         </div>
         """, unsafe_allow_html=True)
+        cards_html = f'<div class="{grid_class}">'
+        for p in phase_policies:
+            global_num = MAP_POLICIES.index(p) + 1
+            nry_str = f"+{p['do_impact_nry']:.1f}"
+            syu_str = f"+{p['do_impact_syu']:.1f}"
+            cards_html += f"""
+            <div class="pcard">
+                <div class="pcard-accent" style="background:{st_obj['accent']}"></div>
+                <div class="pcard-inner">
+                    <div class="pcard-icon-row">
+                        <div class="pcard-icon" style="background:{st_obj['icon_bg']}">{p['icon']}</div>
+                        <span class="pcard-num">POLICY {global_num:02d}</span>
+                    </div>
+                    <div class="pcard-title">{p['title']}</div>
+                    <div class="pcard-detail">{p['detail']}</div>
+                    <div class="pcard-divider"></div>
+                    <div class="pcard-effect-label">기대 효과</div>
+                    <div class="pcard-effect" style="color:{st_obj['effect_color']}">{p['effect']}</div>
+                    <div class="pcard-do-row">
+                        <span class="pcard-do-chip" style="background:{st_obj['do_chip_bg']};color:{st_obj['do_chip_color']}">노량진 {nry_str} mg/L</span>
+                        <span class="pcard-do-chip" style="background:{st_obj['do_chip_bg']};color:{st_obj['do_chip_color']}">선유 {syu_str} mg/L</span>
+                    </div>
+                </div>
+            </div>"""
+        cards_html += '</div>'
+        st.markdown(cards_html, unsafe_allow_html=True)
 
-    # 정책 우선순위 요약
-    st.markdown('<div class="sec-hd">정책 우선순위 로드맵</div>', unsafe_allow_html=True)
+    # ── ③ 로드맵 타임라인 ───────────────────────────────────────────────────
+    st.markdown("""
+    <div class="roadmap-wrap">
+        <div class="roadmap-title">📍 정책 우선순위 로드맵</div>
+        <div class="roadmap-timeline">
+            <div class="roadmap-phase">
+                <div class="roadmap-dot short">⚡</div>
+                <div class="roadmap-phase-label" style="color:#2563eb">단기</div>
+                <div class="roadmap-phase-period">2026 – 2030</div>
+                <div class="roadmap-items">
+                    <div class="roadmap-item">🌬️ 폭기 시설 확충</div>
+                    <div class="roadmap-item">📡 모니터링 고도화</div>
+                    <div class="roadmap-item">🌧️ 초기 우수 저류조</div>
+                </div>
+                <div class="roadmap-target short">DO 최솟값 3.0+</div>
+            </div>
+            <div class="roadmap-phase">
+                <div class="roadmap-dot mid">🔧</div>
+                <div class="roadmap-phase-label" style="color:#0891b2">중기</div>
+                <div class="roadmap-phase-period">2031 – 2040</div>
+                <div class="roadmap-items">
+                    <div class="roadmap-item">🏭 하수처리장 고도화</div>
+                    <div class="roadmap-item">🌿 생태습지 확대</div>
+                    <div class="roadmap-item">🚫 비점오염 관리</div>
+                </div>
+                <div class="roadmap-target mid">DO 연평균 8.0+</div>
+            </div>
+            <div class="roadmap-phase">
+                <div class="roadmap-dot long">🌍</div>
+                <div class="roadmap-phase-label" style="color:#22c55e">장기</div>
+                <div class="roadmap-phase-period">2041 – 2050</div>
+                <div class="roadmap-items">
+                    <div class="roadmap-item">🌳 탄소 감축 달성</div>
+                    <div class="roadmap-item">🏙️ 도시 열섬 완화</div>
+                    <div class="roadmap-item">🏞️ 자연형 하천 복원</div>
+                </div>
+                <div class="roadmap-target long">1등급 연중 60%+</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    fig_road = go.Figure()
-    roadmap = [
-        ('단기 (2026–2030)', ['폭기 시설 확충', '모니터링 고도화', '초기 우수 저류조'], '#2563eb'),
-        ('중기 (2031–2040)', ['하수처리장 고도화 완료', '생태습지 확대', '비점오염 관리 강화'], '#0891b2'),
-        ('장기 (2041–2050)', ['탄소 감축 목표 달성', '도시 열섬 완화', '자연형 하천 복원'], '#22c55e'),
-    ]
-    for i, (period, items, color) in enumerate(roadmap):
-        r,g,b = int(color[1:3],16),int(color[3:5],16),int(color[5:7],16)
-        fig_road.add_trace(go.Bar(
-            x=[len(items)], y=[period], orientation='h',
-            marker_color=f'rgba({r},{g},{b},0.15)',
-            marker_line_color=color, marker_line_width=2,
-            text=[' · '.join(items)], textposition='inside',
-            textfont=dict(color=color, size=12),
-            showlegend=False, name=period,
-            hovertemplate=f"<b>{period}</b><br>{'<br>'.join(items)}<extra></extra>"
-        ))
-
-    fig_road.update_layout(
-        height=200, plot_bgcolor='white', paper_bgcolor='white',
-        margin=dict(l=10,r=10,t=10,b=10),
-        xaxis=dict(visible=False),
-        yaxis=dict(autorange='reversed', tickfont=dict(size=13, color='#374151')),
-        bargap=0.3,
-    )
-    st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
-    st.plotly_chart(fig_road, use_container_width=True, config={'displaylogo': False})
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # ── 정책 실행 전 vs 후 비교 지도 ─────────────────────────────────────────
-    st.markdown('<div class="sec-hd" style="margin-top:40px;">🗺️ 정책 실행 전 vs 후 — DO 수질 지도 비교</div>',
-                unsafe_allow_html=True)
-    st.caption("정책을 선택하고 연도를 설정하면, 실행하지 않았을 때와 실행했을 때의 DO 변화를 지도로 비교합니다.")
+    # ── ④ 정책 전/후 비교 지도 ──────────────────────────────────────────────
+    st.markdown("""
+    <div class="map-section-hd">
+        <div class="map-section-hd-icon">🗺️</div>
+        <div>
+            <div class="map-section-hd-title">정책 실행 전 vs 후 — DO 수질 지도 비교</div>
+            <div class="map-section-hd-sub">정책을 선택하고 연도를 설정하면 DO 등급 변화를 지도로 확인할 수 있습니다</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     pc1, pc2, pc3 = st.columns([2, 2, 1])
     with pc1:
@@ -1493,18 +1627,13 @@ with tab6:
         )
         map_scen_key = "SSP585" if "SSP5-8.5" in map_scenario else "SSP245"
     with pc3:
-        map_year = st.select_slider(
-            "예측 연도", options=[2026, 2030, 2040, 2050], value=2040, key="map_year"
-        )
+        map_year = st.select_slider("예측 연도", options=[2026,2030,2040,2050], value=2040, key="map_year")
 
-    # 기준 DO (정책 미실행)
     base_row    = df_future[df_future["year"] == map_year].iloc[0]
     base_do_nry = base_row[f"{map_scen_key}_노량진_DO"]
     base_do_syu = base_row[f"{map_scen_key}_선유_DO"]
     base_ph_nry = base_row[f"{map_scen_key}_노량진_pH"]
     base_ph_syu = base_row[f"{map_scen_key}_선유_pH"]
-
-    # 정책 적용 후 DO
     total_imp_nry = sum(p["do_impact_nry"] for p in MAP_POLICIES if p["title"] in selected_policies)
     total_imp_syu = sum(p["do_impact_syu"] for p in MAP_POLICIES if p["title"] in selected_policies)
     after_do_nry  = min(base_do_nry + total_imp_nry, 12.0)
@@ -1512,61 +1641,48 @@ with tab6:
     imp_nry = after_do_nry - base_do_nry
     imp_syu = after_do_syu - base_do_syu
     scen_label2 = "SSP5-8.5" if map_scen_key == "SSP585" else "SSP2-4.5"
-
-    # 활성 시설 마커 수집
     active_markers = []
     for title in selected_policies:
         active_markers.extend(POLICY_MARKERS.get(title, []))
 
-    # 요약 배너
     st.markdown(f"""
-    <div style='display:flex;gap:16px;margin:10px 0 16px 0;flex-wrap:wrap'>
-        <div style='flex:1;min-width:240px;background:#FEF9E7;border-left:4px solid #F39C12;
-        padding:10px 14px;border-radius:8px'>
-            <b>📍 정책 미실행</b> | {scen_label2} {map_year}년<br>
-            노량진 DO: <b style='color:{do_color(base_do_nry)}'>{base_do_nry:.2f} mg/L</b> &nbsp;
-            선유 DO: <b style='color:{do_color(base_do_syu)}'>{base_do_syu:.2f} mg/L</b>
+    <div style='display:flex;gap:14px;margin:12px 0 16px;flex-wrap:wrap'>
+        <div style='flex:1;min-width:220px;background:#fefce8;border:1px solid #fde047;
+        padding:12px 16px;border-radius:12px'>
+            <div style='font-size:11px;font-weight:700;color:#a16207;letter-spacing:.06em;margin-bottom:6px'>❌ 정책 미실행 · {scen_label2} {map_year}년</div>
+            <div style='font-size:15px;font-weight:800;color:{do_color(base_do_nry)}'>노량진 {base_do_nry:.2f} mg/L</div>
+            <div style='font-size:15px;font-weight:800;color:{do_color(base_do_syu)}'>선유&nbsp;&nbsp;&nbsp;&nbsp; {base_do_syu:.2f} mg/L</div>
         </div>
-        <div style='flex:1;min-width:240px;background:#EAFAF1;border-left:4px solid #27AE60;
-        padding:10px 14px;border-radius:8px'>
-            <b>✅ 정책 실행 후</b> | 선택 정책 {len(selected_policies)}개 적용<br>
-            노량진 DO: <b style='color:{do_color(after_do_nry)}'>{after_do_nry:.2f} mg/L</b>
-            <span style='color:#27AE60;font-size:12px'>(+{imp_nry:.2f})</span> &nbsp;
-            선유 DO: <b style='color:{do_color(after_do_syu)}'>{after_do_syu:.2f} mg/L</b>
-            <span style='color:#27AE60;font-size:12px'>(+{imp_syu:.2f})</span>
+        <div style='flex:1;min-width:220px;background:#f0fdf4;border:1px solid #86efac;
+        padding:12px 16px;border-radius:12px'>
+            <div style='font-size:11px;font-weight:700;color:#166534;letter-spacing:.06em;margin-bottom:6px'>✅ 정책 실행 후 · {len(selected_policies)}개 정책 적용</div>
+            <div style='font-size:15px;font-weight:800;color:{do_color(after_do_nry)}'>노량진 {after_do_nry:.2f} mg/L <span style='font-size:12px;color:#15803d'>(+{imp_nry:.2f})</span></div>
+            <div style='font-size:15px;font-weight:800;color:{do_color(after_do_syu)}'>선유&nbsp;&nbsp;&nbsp;&nbsp; {after_do_syu:.2f} mg/L <span style='font-size:12px;color:#15803d'>(+{imp_syu:.2f})</span></div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # 좌우 지도
-    map_col1, map_col2 = st.columns(2)
     center = [37.522, 126.906]
+    map_col1, map_col2 = st.columns(2)
     with map_col1:
         st.markdown("**❌ 정책 미실행**")
-        m_before = build_map(center, base_do_nry, base_do_syu,
-                             base_ph_nry, base_ph_syu,
+        m_before = build_map(center, base_do_nry, base_do_syu, base_ph_nry, base_ph_syu,
                              map_year, f"미실행 ({scen_label2})")
         st_folium(m_before, width=None, height=400, key="map_before")
     with map_col2:
         st.markdown("**✅ 정책 실행 후**")
-        m_after = build_map(center, after_do_nry, after_do_syu,
-                            base_ph_nry, base_ph_syu,
-                            map_year, f"실행 후 ({scen_label2})",
-                            policy_markers=active_markers)
+        m_after = build_map(center, after_do_nry, after_do_syu, base_ph_nry, base_ph_syu,
+                            map_year, f"실행 후 ({scen_label2})", policy_markers=active_markers)
         st_folium(m_after, width=None, height=400, key="map_after")
 
-    # 등급 변화 요약
     st.divider()
-    st.markdown("**📊 수질 등급 변화 요약**")
     sg1, sg2 = st.columns(2)
     with sg1:
-        st.metric("노량진 DO", f"{after_do_nry:.2f} mg/L",
-                  delta=f"+{imp_nry:.2f} mg/L",
+        st.metric("노량진 DO", f"{after_do_nry:.2f} mg/L", delta=f"+{imp_nry:.2f} mg/L",
                   help=f"미실행: {base_do_nry:.2f} → 실행 후: {after_do_nry:.2f}")
         st.caption(f"등급 변화: {do_grade_label(base_do_nry)} → {do_grade_label(after_do_nry)}")
     with sg2:
-        st.metric("선유 DO", f"{after_do_syu:.2f} mg/L",
-                  delta=f"+{imp_syu:.2f} mg/L",
+        st.metric("선유 DO", f"{after_do_syu:.2f} mg/L", delta=f"+{imp_syu:.2f} mg/L",
                   help=f"미실행: {base_do_syu:.2f} → 실행 후: {after_do_syu:.2f}")
         st.caption(f"등급 변화: {do_grade_label(base_do_syu)} → {do_grade_label(after_do_syu)}")
 
@@ -1577,14 +1693,10 @@ with tab6:
     else:
         st.success(f"✅ {map_year}년 {scen_label2} — 정책 실행 시 수질 관리 가능 범위 유지")
 
-    st.info("💡 **핵심 메시지**: 기후변화 속 여름철 DO 취약성이 심화되고 있습니다. "
-            "단기 폭기시설·모니터링부터 장기 탄소감축까지 3단계 정책이 한강의 미래를 결정합니다.")
-
 
 # 푸터
 st.markdown("""
-<div style="text-align:center; font-size:12px; color:#9ca3af; margin-top:40px;
-     padding: 16px 0; border-top: 1px solid #f3f4f6;">
+<div style="text-align:center;font-size:12px;color:#9ca3af;margin-top:40px;padding:16px 0;border-top:1px solid #f3f4f6;">
     데이터 출처: 서울 열린데이터 광장 · 서울시 요일별 한강 수질 현황 (2020) &nbsp;|&nbsp;
     노량진 · 선유 측정소 시간별 실측값 일평균 &nbsp;|&nbsp;
     예측: IPCC AR6 SSP2-4.5 / SSP5-8.5 시나리오 적용
