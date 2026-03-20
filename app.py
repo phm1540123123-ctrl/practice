@@ -467,214 +467,496 @@ MLBs = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','
 # TAB 1 : 시계열
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab1:
-    st.markdown('<div class="sec-hd">날짜별 수질 시계열 — 범례 클릭으로 계열 선택</div>',
-                unsafe_allow_html=True)
+    st.markdown(
+        '<p style="font-size:17px; font-weight:700; color:#0c1e3c; '
+        'border-left:4px solid #2563eb; padding-left:12px; margin-bottom:6px;">'
+        '📈 날짜별 수질 시계열</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<p style="font-size:14px; color:#4b5563; margin-bottom:20px;">'
+        '아래 옵션에서 <b>지표</b>와 <b>측정 지점</b>을 선택하면 해당 그래프만 표시됩니다.</p>',
+        unsafe_allow_html=True,
+    )
 
-    c1, c2, c3 = st.columns([2, 2, 2])
-    with c1:
-        view_mode = st.selectbox("표시 항목", ["pH + DO 동시", "pH만", "DO만"])
-    with c2:
-        stations = st.multiselect("측정 지점", ["노량진", "선유"], default=["노량진", "선유"])
-    with c3:
-        date_range = st.date_input(
-            "기간",
+    # ── 컨트롤 ──────────────────────────────────────────────────────────────
+    ctrl1, ctrl2, ctrl3 = st.columns([2, 2, 2])
+    with ctrl1:
+        t1_indicator = st.selectbox(
+            "📊 표시할 지표",
+            ["DO (용존산소)와 pH 모두", "DO (용존산소)만", "pH만"],
+            key="t1_indicator",
+        )
+    with ctrl2:
+        t1_stations = st.multiselect(
+            "📍 측정 지점",
+            ["노량진", "선유"],
+            default=["노량진", "선유"],
+            key="t1_stations",
+        )
+    with ctrl3:
+        t1_date = st.date_input(
+            "📅 기간 선택",
             value=(df['date'].min().date(), df['date'].max().date()),
             min_value=df['date'].min().date(),
             max_value=df['date'].max().date(),
+            key="t1_date",
         )
 
-    if not stations:
-        st.warning("측정 지점을 하나 이상 선택해 주세요.")
+    if not t1_stations:
+        st.warning("⚠️ 측정 지점을 하나 이상 선택해 주세요.")
         st.stop()
 
-    if isinstance(date_range, (list, tuple)) and len(date_range) == 2:
-        mask = (df['date'].dt.date >= date_range[0]) & (df['date'].dt.date <= date_range[1])
+    # 날짜 필터
+    if isinstance(t1_date, (list, tuple)) and len(t1_date) == 2:
+        mask = (df['date'].dt.date >= t1_date[0]) & (df['date'].dt.date <= t1_date[1])
         dff = df[mask].copy()
     else:
         dff = df.copy()
 
-    show_ph = view_mode in ["pH + DO 동시", "pH만"]
-    show_do = view_mode in ["pH + DO 동시", "DO만"]
-    is_dual = show_ph and show_do
+    show_do = t1_indicator in ["DO (용존산소)와 pH 모두", "DO (용존산소)만"]
+    show_ph = t1_indicator in ["DO (용존산소)와 pH 모두", "pH만"]
+    is_dual = show_do and show_ph
 
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.07,
-                        subplot_titles=("수소이온농도 (pH)", "용존산소 (DO, mg/L)")) \
-          if is_dual else go.Figure()
+    # ── 컬러 정의 ─────────────────────────────────────────────────────────
+    C = {
+        '노량진_DO': '#0891b2', '선유_DO': '#d97706',
+        '노량진_pH': '#2563eb', '선유_pH': '#ea580c',
+    }
 
-    def add_line(fig, x, y, name, color, row=None):
-        kw = dict(x=x, y=y, name=name, mode='lines',
-                  line=dict(color=color, width=1.8),
-                  hovertemplate=f"<b>{name}</b><br>%{{x|%Y-%m-%d}}<br>%{{y:.3f}}<extra></extra>")
-        fig.add_trace(go.Scatter(**kw), row=row, col=1) if row else fig.add_trace(go.Scatter(**kw))
-
-    if show_ph:
-        for s in stations:
-            add_line(fig, dff['date'], dff[f'pH_{s}'], f'{s} pH',
-                     COLORS[f'{s}_pH'], row=1 if is_dual else None)
-        ref = dict(line_dash='dot', line_color='rgba(100,100,100,0.5)', annotation_font_size=10)
-        if is_dual:
-            fig.add_hline(y=6.5, annotation_text='하한 6.5', row=1, col=1, **ref)
-            fig.add_hline(y=8.5, annotation_text='상한 8.5', row=1, col=1, **ref)
+    def _line(fig, x, y, name, color, row=None):
+        kw = dict(
+            x=x, y=y, name=name, mode='lines',
+            line=dict(color=color, width=2.2),
+            hovertemplate=f"<b>{name}</b><br>날짜: %{{x|%Y-%m-%d}}<br>값: %{{y:.3f}}<extra></extra>",
+        )
+        if row:
+            fig.add_trace(go.Scatter(**kw), row=row, col=1)
         else:
-            fig.add_hline(y=6.5, annotation_text='하한 6.5', **ref)
-            fig.add_hline(y=8.5, annotation_text='상한 8.5', **ref)
+            fig.add_trace(go.Scatter(**kw))
 
-    if show_do:
-        for s in stations:
-            add_line(fig, dff['date'], dff[f'DO_{s}'], f'{s} DO',
-                     COLORS[f'{s}_DO'], row=2 if is_dual else None)
-        ref2 = dict(line_dash='dot', line_color='rgba(220,38,38,0.6)',
-                    annotation_text='생존 하한 5.0 mg/L',
-                    annotation_font_color='#dc2626', annotation_font_size=10)
-        if is_dual:
-            fig.add_hline(y=5.0, row=2, col=1, **ref2)
-        else:
-            fig.add_hline(y=5.0, **ref2)
+    # ── DO 단독 ───────────────────────────────────────────────────────────
+    if show_do and not show_ph:
+        st.markdown(
+            '<p style="font-size:15px;font-weight:600;color:#0891b2;margin:12px 0 4px;">💧 용존산소 (DO)</p>',
+            unsafe_allow_html=True,
+        )
+        fig_do = go.Figure()
+        for s in t1_stations:
+            _line(fig_do, dff['date'], dff[f'DO_{s}'], f'{s} DO', C[f'{s}_DO'])
+        fig_do.add_hline(
+            y=5.0, line_dash='dot', line_color='#dc2626',
+            annotation_text='🚨 수생태계 위험 하한 5.0 mg/L',
+            annotation_font_color='#dc2626', annotation_font_size=12,
+        )
+        fig_do.add_hline(
+            y=7.5, line_dash='dot', line_color='#16a34a',
+            annotation_text='✅ 1등급 기준 7.5 mg/L',
+            annotation_font_color='#16a34a', annotation_font_size=12,
+        )
+        fig_do.update_layout(
+            height=400, plot_bgcolor='white', paper_bgcolor='white',
+            margin=dict(l=10, r=10, t=20, b=10), hovermode='x unified',
+            yaxis=dict(title='DO (mg/L)', title_font=dict(size=13)),
+            xaxis=dict(title='날짜', title_font=dict(size=13)),
+            legend=dict(orientation='h', y=1.06, xanchor='right', x=1,
+                        font=dict(size=13), bgcolor='rgba(255,255,255,0.8)'),
+        )
+        fig_do.update_xaxes(showgrid=True, gridcolor='#f3f4f6')
+        fig_do.update_yaxes(showgrid=True, gridcolor='#f3f4f6')
+        st.plotly_chart(fig_do, use_container_width=True,
+                        config={'modeBarButtonsToRemove': ['lasso2d','select2d'], 'displaylogo': False})
 
-    fig.update_layout(
-        height=520 if is_dual else 360,
-        plot_bgcolor='white', paper_bgcolor='white',
-        margin=dict(l=10, r=10, t=36, b=10), hovermode='x unified',
-        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1, font=dict(size=12)),
-    )
-    fig.update_xaxes(showgrid=True, gridcolor='#f3f4f6', linecolor='#e5e7eb')
-    fig.update_yaxes(showgrid=True, gridcolor='#f3f4f6', linecolor='#e5e7eb')
+    # ── pH 단독 ───────────────────────────────────────────────────────────
+    elif show_ph and not show_do:
+        st.markdown(
+            '<p style="font-size:15px;font-weight:600;color:#2563eb;margin:12px 0 4px;">🔵 수소이온농도 (pH)</p>',
+            unsafe_allow_html=True,
+        )
+        fig_ph = go.Figure()
+        for s in t1_stations:
+            _line(fig_ph, dff['date'], dff[f'pH_{s}'], f'{s} pH', C[f'{s}_pH'])
+        fig_ph.add_hline(
+            y=6.5, line_dash='dot', line_color='#6b7280',
+            annotation_text='환경부 하한 6.5', annotation_font_size=12,
+        )
+        fig_ph.add_hline(
+            y=8.5, line_dash='dot', line_color='#6b7280',
+            annotation_text='환경부 상한 8.5', annotation_font_size=12,
+        )
+        fig_ph.update_layout(
+            height=400, plot_bgcolor='white', paper_bgcolor='white',
+            margin=dict(l=10, r=10, t=20, b=10), hovermode='x unified',
+            yaxis=dict(title='pH', range=[6.0, 9.2], title_font=dict(size=13)),
+            xaxis=dict(title='날짜', title_font=dict(size=13)),
+            legend=dict(orientation='h', y=1.06, xanchor='right', x=1,
+                        font=dict(size=13), bgcolor='rgba(255,255,255,0.8)'),
+        )
+        fig_ph.update_xaxes(showgrid=True, gridcolor='#f3f4f6')
+        fig_ph.update_yaxes(showgrid=True, gridcolor='#f3f4f6')
+        st.plotly_chart(fig_ph, use_container_width=True,
+                        config={'modeBarButtonsToRemove': ['lasso2d','select2d'], 'displaylogo': False})
 
-    st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=True,
-                    config={'displayModeBar': True,
-                            'modeBarButtonsToRemove': ['lasso2d', 'select2d'],
-                            'displaylogo': False})
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.caption("💡 범례 클릭: 계열 켜기/끄기  ·  드래그: 구간 확대  ·  더블클릭: 초기화")
+    # ── DO + pH 동시 (상하 두 개) ─────────────────────────────────────────
+    else:
+        # DO 그래프
+        st.markdown(
+            '<p style="font-size:15px;font-weight:600;color:#0891b2;margin:12px 0 4px;">💧 용존산소 (DO)</p>',
+            unsafe_allow_html=True,
+        )
+        fig_do2 = go.Figure()
+        for s in t1_stations:
+            _line(fig_do2, dff['date'], dff[f'DO_{s}'], f'{s} DO', C[f'{s}_DO'])
+        fig_do2.add_hline(y=5.0, line_dash='dot', line_color='#dc2626',
+                          annotation_text='🚨 위험 하한 5.0 mg/L',
+                          annotation_font_color='#dc2626', annotation_font_size=12)
+        fig_do2.add_hline(y=7.5, line_dash='dot', line_color='#16a34a',
+                          annotation_text='✅ 1등급 7.5 mg/L',
+                          annotation_font_color='#16a34a', annotation_font_size=12)
+        fig_do2.update_layout(
+            height=360, plot_bgcolor='white', paper_bgcolor='white',
+            margin=dict(l=10, r=10, t=16, b=10), hovermode='x unified',
+            yaxis=dict(title='DO (mg/L)', title_font=dict(size=13)),
+            xaxis=dict(showticklabels=False),
+            legend=dict(orientation='h', y=1.06, xanchor='right', x=1,
+                        font=dict(size=13), bgcolor='rgba(255,255,255,0.8)'),
+        )
+        fig_do2.update_xaxes(showgrid=True, gridcolor='#f3f4f6')
+        fig_do2.update_yaxes(showgrid=True, gridcolor='#f3f4f6')
+        st.plotly_chart(fig_do2, use_container_width=True,
+                        config={'modeBarButtonsToRemove': ['lasso2d','select2d'], 'displaylogo': False})
 
-    with st.expander("원시 데이터 보기 / CSV 다운로드"):
-        cols_show = ['date'] + [f'pH_{s}' for s in stations] + [f'DO_{s}' for s in stations]
+        # pH 그래프
+        st.markdown(
+            '<p style="font-size:15px;font-weight:600;color:#2563eb;margin:12px 0 4px;">🔵 수소이온농도 (pH)</p>',
+            unsafe_allow_html=True,
+        )
+        fig_ph2 = go.Figure()
+        for s in t1_stations:
+            _line(fig_ph2, dff['date'], dff[f'pH_{s}'], f'{s} pH', C[f'{s}_pH'])
+        fig_ph2.add_hline(y=6.5, line_dash='dot', line_color='#6b7280',
+                          annotation_text='환경부 하한 6.5', annotation_font_size=12)
+        fig_ph2.add_hline(y=8.5, line_dash='dot', line_color='#6b7280',
+                          annotation_text='환경부 상한 8.5', annotation_font_size=12)
+        fig_ph2.update_layout(
+            height=360, plot_bgcolor='white', paper_bgcolor='white',
+            margin=dict(l=10, r=10, t=16, b=10), hovermode='x unified',
+            yaxis=dict(title='pH', range=[6.0, 9.2], title_font=dict(size=13)),
+            xaxis=dict(title='날짜', title_font=dict(size=13)),
+            legend=dict(orientation='h', y=1.06, xanchor='right', x=1,
+                        font=dict(size=13), bgcolor='rgba(255,255,255,0.8)'),
+        )
+        fig_ph2.update_xaxes(showgrid=True, gridcolor='#f3f4f6')
+        fig_ph2.update_yaxes(showgrid=True, gridcolor='#f3f4f6')
+        st.plotly_chart(fig_ph2, use_container_width=True,
+                        config={'modeBarButtonsToRemove': ['lasso2d','select2d'], 'displaylogo': False})
+
+    st.caption("💡 그래프를 드래그하면 확대, 더블클릭하면 초기화됩니다.")
+
+    with st.expander("📋 원시 데이터 보기 / CSV 다운로드"):
+        cols_show = ['date'] + [f'pH_{s}' for s in t1_stations] + [f'DO_{s}' for s in t1_stations]
         disp = dff[cols_show].copy()
         disp['date'] = disp['date'].dt.strftime('%Y-%m-%d')
-        disp.columns = ['날짜'] + [f'pH ({s})' for s in stations] + [f'DO ({s}) mg/L' for s in stations]
+        disp.columns = (
+            ['날짜']
+            + [f'pH ({s})' for s in t1_stations]
+            + [f'DO ({s}) mg/L' for s in t1_stations]
+        )
         st.dataframe(disp, use_container_width=True, height=260)
-        st.download_button("⬇️ CSV 다운로드", disp.to_csv(index=False).encode('utf-8-sig'),
-                           file_name="hangang_2020.csv", mime="text/csv")
+        st.download_button(
+            "⬇️ CSV 다운로드",
+            disp.to_csv(index=False).encode('utf-8-sig'),
+            file_name="hangang_2020.csv", mime="text/csv",
+        )
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 2 : 월별 패턴
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab2:
-    st.markdown('<div class="sec-hd">월별 평균 · 최솟값 · 최댓값 비교</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<p style="font-size:17px; font-weight:700; color:#0c1e3c; '
+        'border-left:4px solid #2563eb; padding-left:12px; margin-bottom:6px;">'
+        '📅 월별 수질 패턴</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<p style="font-size:14px; color:#4b5563; margin-bottom:20px;">'
+        '월별 평균값과 최솟값·최댓값 범위를 함께 확인할 수 있습니다. '
+        '측정 지점을 선택해 원하는 데이터만 비교해 보세요.</p>',
+        unsafe_allow_html=True,
+    )
 
     df['month'] = df['date'].dt.month
     monthly = df.groupby('month').agg(
-        ph_ny_mean=('pH_노량진','mean'), ph_sy_mean=('pH_선유','mean'),
-        ph_ny_min=('pH_노량진','min'),   ph_sy_min=('pH_선유','min'),
-        ph_ny_max=('pH_노량진','max'),   ph_sy_max=('pH_선유','max'),
-        do_ny_mean=('DO_노량진','mean'), do_sy_mean=('DO_선유','mean'),
-        do_ny_min=('DO_노량진','min'),   do_sy_min=('DO_선유','min'),
-        do_ny_max=('DO_노량진','max'),   do_sy_max=('DO_선유','max'),
+        ph_ny_mean=('pH_노량진', 'mean'), ph_sy_mean=('pH_선유', 'mean'),
+        ph_ny_min=('pH_노량진', 'min'),   ph_sy_min=('pH_선유', 'min'),
+        ph_ny_max=('pH_노량진', 'max'),   ph_sy_max=('pH_선유', 'max'),
+        do_ny_mean=('DO_노량진', 'mean'), do_sy_mean=('DO_선유', 'mean'),
+        do_ny_min=('DO_노량진', 'min'),   do_sy_min=('DO_선유', 'min'),
+        do_ny_max=('DO_노량진', 'max'),   do_sy_max=('DO_선유', 'max'),
     ).reset_index()
 
-    subtab1, subtab2 = st.tabs(["pH 월별", "DO 월별"])
+    # ── 지점 선택 컨트롤 ────────────────────────────────────────────────
+    t2_stations = st.multiselect(
+        "📍 비교할 측정 지점 선택",
+        ["노량진", "선유"],
+        default=["노량진", "선유"],
+        key="t2_stations",
+    )
+    if not t2_stations:
+        st.warning("⚠️ 측정 지점을 하나 이상 선택해 주세요.")
+        st.stop()
+
+    # 지점별 색상
+    ST_COLORS = {
+        'DO': {'노량진': '#0891b2', '선유': '#d97706'},
+        'pH': {'노량진': '#2563eb', '선유': '#ea580c'},
+    }
+    ST_COLS = {
+        'DO': {'노량진': ('do_ny_max', 'do_ny_min', 'do_ny_mean'),
+               '선유':   ('do_sy_max', 'do_sy_min', 'do_sy_mean')},
+        'pH': {'노량진': ('ph_ny_max', 'ph_ny_min', 'ph_ny_mean'),
+               '선유':   ('ph_sy_max', 'ph_sy_min', 'ph_sy_mean')},
+    }
 
     def band_trace(x, hi, lo, color_hex, name):
-        r,g,b = int(color_hex[1:3],16), int(color_hex[3:5],16), int(color_hex[5:7],16)
+        r, g, b = int(color_hex[1:3], 16), int(color_hex[3:5], 16), int(color_hex[5:7], 16)
         return go.Scatter(
             x=x + x[::-1], y=list(hi) + list(lo)[::-1],
-            fill='toself', fillcolor=f'rgba({r},{g},{b},0.09)',
-            line=dict(color='rgba(255,255,255,0)'), showlegend=False, name=name)
+            fill='toself', fillcolor=f'rgba({r},{g},{b},0.10)',
+            line=dict(color='rgba(255,255,255,0)'), showlegend=False, name=f'{name} 범위',
+            hoverinfo='skip',
+        )
+
+    subtab1, subtab2 = st.tabs(["💧 DO (용존산소)", "🔵 pH (수소이온농도)"])
 
     with subtab1:
-        fig_m = go.Figure()
-        fig_m.add_trace(band_trace(MLBs, monthly['ph_ny_max'], monthly['ph_ny_min'], '#2563eb', '노량진 범위'))
-        fig_m.add_trace(band_trace(MLBs, monthly['ph_sy_max'], monthly['ph_sy_min'], '#ea580c', '선유 범위'))
-        fig_m.add_trace(go.Scatter(x=MLBs, y=monthly['ph_ny_mean'].round(3), name='노량진 평균',
-                                   mode='lines+markers', line=dict(color='#2563eb', width=2.5), marker=dict(size=7)))
-        fig_m.add_trace(go.Scatter(x=MLBs, y=monthly['ph_sy_mean'].round(3), name='선유 평균',
-                                   mode='lines+markers', line=dict(color='#ea580c', width=2.5), marker=dict(size=7)))
-        fig_m.add_hline(y=6.5, line_dash='dot', line_color='gray', annotation_text='환경부 하한 6.5', annotation_font_size=10)
-        fig_m.add_hline(y=8.5, line_dash='dot', line_color='gray', annotation_text='환경부 상한 8.5', annotation_font_size=10)
-        fig_m.update_layout(height=340, plot_bgcolor='white', paper_bgcolor='white',
-                             margin=dict(l=10,r=10,t=16,b=10), yaxis=dict(range=[6.0,9.2],title='pH'),
-                             legend=dict(orientation='h',y=1.08,xanchor='right',x=1))
-        st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
-        st.plotly_chart(fig_m, use_container_width=True, config={'displaylogo': False})
-        st.markdown('</div>', unsafe_allow_html=True)
+        fig_do_m = go.Figure()
+        for s in t2_stations:
+            c_max, c_min, c_mean = ST_COLS['DO'][s]
+            clr = ST_COLORS['DO'][s]
+            fig_do_m.add_trace(band_trace(MLBs, monthly[c_max], monthly[c_min], clr, s))
+            fig_do_m.add_trace(go.Scatter(
+                x=MLBs, y=monthly[c_mean].round(2),
+                name=f'{s} 평균', mode='lines+markers',
+                line=dict(color=clr, width=2.8),
+                marker=dict(size=9),
+                hovertemplate=f'<b>{s}</b><br>%{{x}}<br>평균 DO: %{{y:.2f}} mg/L<extra></extra>',
+            ))
+        fig_do_m.add_hline(
+            y=5.0, line_dash='dot', line_color='#dc2626',
+            annotation_text='🚨 수생태계 위험 하한 5.0 mg/L',
+            annotation_font_color='#dc2626', annotation_font_size=12,
+        )
+        fig_do_m.add_hline(
+            y=7.5, line_dash='dot', line_color='#16a34a',
+            annotation_text='✅ 1등급 기준 7.5 mg/L',
+            annotation_font_color='#16a34a', annotation_font_size=12,
+        )
+        fig_do_m.update_layout(
+            height=400, plot_bgcolor='white', paper_bgcolor='white',
+            margin=dict(l=10, r=10, t=20, b=10),
+            yaxis=dict(range=[0, 14], title='DO (mg/L)', title_font=dict(size=14),
+                       tickfont=dict(size=12)),
+            xaxis=dict(title='월', title_font=dict(size=14), tickfont=dict(size=13)),
+            legend=dict(orientation='h', y=1.08, xanchor='right', x=1,
+                        font=dict(size=13), bgcolor='rgba(255,255,255,0.8)'),
+            hovermode='x unified',
+        )
+        fig_do_m.update_xaxes(showgrid=True, gridcolor='#f3f4f6')
+        fig_do_m.update_yaxes(showgrid=True, gridcolor='#f3f4f6')
+        st.plotly_chart(fig_do_m, use_container_width=True, config={'displaylogo': False})
+        st.caption("💡 색 밴드는 월별 최솟값~최댓값 범위를 나타냅니다.")
 
     with subtab2:
-        fig_d = go.Figure()
-        fig_d.add_trace(band_trace(MLBs, monthly['do_ny_max'], monthly['do_ny_min'], '#0891b2', '노량진 범위'))
-        fig_d.add_trace(band_trace(MLBs, monthly['do_sy_max'], monthly['do_sy_min'], '#d97706', '선유 범위'))
-        fig_d.add_trace(go.Scatter(x=MLBs, y=monthly['do_ny_mean'].round(3), name='노량진 평균',
-                                   mode='lines+markers', line=dict(color='#0891b2', width=2.5), marker=dict(size=7)))
-        fig_d.add_trace(go.Scatter(x=MLBs, y=monthly['do_sy_mean'].round(3), name='선유 평균',
-                                   mode='lines+markers', line=dict(color='#d97706', width=2.5), marker=dict(size=7)))
-        fig_d.add_hline(y=5.0, line_dash='dot', line_color='#dc2626',
-                        annotation_text='수생태계 위험 하한 5.0', annotation_font_color='#dc2626', annotation_font_size=10)
-        fig_d.update_layout(height=340, plot_bgcolor='white', paper_bgcolor='white',
-                             margin=dict(l=10,r=10,t=16,b=10), yaxis=dict(range=[0,14],title='mg/L'),
-                             legend=dict(orientation='h',y=1.08,xanchor='right',x=1))
-        st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
-        st.plotly_chart(fig_d, use_container_width=True, config={'displaylogo': False})
-        st.markdown('</div>', unsafe_allow_html=True)
+        fig_ph_m = go.Figure()
+        for s in t2_stations:
+            c_max, c_min, c_mean = ST_COLS['pH'][s]
+            clr = ST_COLORS['pH'][s]
+            fig_ph_m.add_trace(band_trace(MLBs, monthly[c_max], monthly[c_min], clr, s))
+            fig_ph_m.add_trace(go.Scatter(
+                x=MLBs, y=monthly[c_mean].round(3),
+                name=f'{s} 평균', mode='lines+markers',
+                line=dict(color=clr, width=2.8),
+                marker=dict(size=9),
+                hovertemplate=f'<b>{s}</b><br>%{{x}}<br>평균 pH: %{{y:.3f}}<extra></extra>',
+            ))
+        fig_ph_m.add_hline(
+            y=6.5, line_dash='dot', line_color='#6b7280',
+            annotation_text='환경부 하한 6.5', annotation_font_size=12,
+        )
+        fig_ph_m.add_hline(
+            y=8.5, line_dash='dot', line_color='#6b7280',
+            annotation_text='환경부 상한 8.5', annotation_font_size=12,
+        )
+        fig_ph_m.update_layout(
+            height=400, plot_bgcolor='white', paper_bgcolor='white',
+            margin=dict(l=10, r=10, t=20, b=10),
+            yaxis=dict(range=[6.0, 9.2], title='pH', title_font=dict(size=14),
+                       tickfont=dict(size=12)),
+            xaxis=dict(title='월', title_font=dict(size=14), tickfont=dict(size=13)),
+            legend=dict(orientation='h', y=1.08, xanchor='right', x=1,
+                        font=dict(size=13), bgcolor='rgba(255,255,255,0.8)'),
+            hovermode='x unified',
+        )
+        fig_ph_m.update_xaxes(showgrid=True, gridcolor='#f3f4f6')
+        fig_ph_m.update_yaxes(showgrid=True, gridcolor='#f3f4f6')
+        st.plotly_chart(fig_ph_m, use_container_width=True, config={'displaylogo': False})
+        st.caption("💡 색 밴드는 월별 최솟값~최댓값 범위를 나타냅니다.")
 
-    st.markdown('<div class="sec-hd">월별 상세 수치표</div>', unsafe_allow_html=True)
-    tbl = pd.DataFrame({
-        '월': MLBs,
-        'pH 노량진 (평균)':   monthly['ph_ny_mean'].round(2),
-        'pH 선유 (평균)':     monthly['ph_sy_mean'].round(2),
-        'DO 노량진 (평균)':   monthly['do_ny_mean'].round(2),
-        'DO 선유 (평균)':     monthly['do_sy_mean'].round(2),
-        'DO 노량진 (최솟값)': monthly['do_ny_min'].round(2),
-        'DO 선유 (최솟값)':   monthly['do_sy_min'].round(2),
-    })
-    st.dataframe(tbl, use_container_width=True, hide_index=True)
+    # 수치표
+    st.markdown(
+        '<p style="font-size:16px; font-weight:700; color:#0c1e3c; '
+        'border-left:4px solid #2563eb; padding-left:12px; margin:28px 0 12px;">'
+        '📋 월별 상세 수치표</p>',
+        unsafe_allow_html=True,
+    )
+    tbl_cols = {'월': MLBs}
+    for s in t2_stations:
+        if 'DO' in ['DO']:
+            tbl_cols[f'DO {s} 평균'] = monthly[ST_COLS['DO'][s][2]].round(2)
+            tbl_cols[f'DO {s} 최솟값'] = monthly[ST_COLS['DO'][s][1]].round(2)
+        tbl_cols[f'pH {s} 평균'] = monthly[ST_COLS['pH'][s][2]].round(3)
+    st.dataframe(pd.DataFrame(tbl_cols), use_container_width=True, hide_index=True)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 3 : 상관관계
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab3:
-    st.markdown('<div class="sec-hd">pH – DO 상관관계 분석</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<p style="font-size:17px; font-weight:700; color:#0c1e3c; '
+        'border-left:4px solid #2563eb; padding-left:12px; margin-bottom:6px;">'
+        '🔗 pH – DO 상관관계 분석</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<p style="font-size:14px; color:#4b5563; margin-bottom:20px;">'
+        'x축은 pH, y축은 DO(용존산소)입니다. 각 점은 하루의 일평균 데이터이며, '
+        '점들이 오른쪽 위 방향으로 모일수록 두 지표가 함께 높아지는 경향이 강하다는 뜻입니다.</p>',
+        unsafe_allow_html=True,
+    )
 
+    # ── 산점도 ────────────────────────────────────────────────────────────
     fig_s = go.Figure()
     corrs = {}
-    for nm, pc, dc, clr in [('노량진','pH_노량진','DO_노량진','#2563eb'),
-                              ('선유','pH_선유','DO_선유','#ea580c')]:
+    for nm, pc, dc, clr in [
+        ('노량진', 'pH_노량진', 'DO_노량진', '#2563eb'),
+        ('선유',   'pH_선유',   'DO_선유',   '#ea580c'),
+    ]:
         tmp = df[[pc, dc, 'date']].dropna()
-        fig_s.add_trace(go.Scatter(x=tmp[pc], y=tmp[dc], mode='markers', name=nm,
-                                   marker=dict(color=clr, size=5, opacity=0.45),
-                                   hovertemplate=f"<b>{nm}</b><br>pH: %{{x:.3f}}<br>DO: %{{y:.3f}} mg/L<extra></extra>"))
+        fig_s.add_trace(go.Scatter(
+            x=tmp[pc], y=tmp[dc], mode='markers', name=f'{nm} 일별 데이터',
+            marker=dict(color=clr, size=6, opacity=0.45),
+            hovertemplate=(
+                f"<b>{nm}</b><br>"
+                f"pH: %{{x:.3f}}<br>"
+                f"DO: %{{y:.3f}} mg/L<extra></extra>"
+            ),
+        ))
         z = np.polyfit(tmp[pc], tmp[dc], 1)
         xr = np.linspace(tmp[pc].min(), tmp[pc].max(), 100)
-        fig_s.add_trace(go.Scatter(x=xr, y=np.polyval(z, xr), mode='lines', name=f'{nm} 추세선',
-                                   line=dict(color=clr, width=2, dash='dash')))
+        fig_s.add_trace(go.Scatter(
+            x=xr, y=np.polyval(z, xr), mode='lines',
+            name=f'{nm} 추세선 (r={tmp[[pc,dc]].corr().iloc[0,1]:.3f})',
+            line=dict(color=clr, width=2.5, dash='dash'),
+        ))
         corrs[nm] = tmp[[pc, dc]].corr().iloc[0, 1]
 
-    fig_s.update_layout(height=400, plot_bgcolor='white', paper_bgcolor='white',
-                        margin=dict(l=10,r=10,t=10,b=10),
-                        xaxis=dict(title='pH (일평균)', showgrid=True, gridcolor='#f3f4f6'),
-                        yaxis=dict(title='DO mg/L (일평균)', showgrid=True, gridcolor='#f3f4f6'),
-                        legend=dict(orientation='h',y=1.06,xanchor='right',x=1))
-    st.markdown('<div class="chart-wrap">', unsafe_allow_html=True)
+    fig_s.update_layout(
+        height=440, plot_bgcolor='white', paper_bgcolor='white',
+        margin=dict(l=10, r=10, t=20, b=10),
+        xaxis=dict(
+            title='pH (일평균)',
+            title_font=dict(size=14),
+            tickfont=dict(size=12),
+            showgrid=True, gridcolor='#f3f4f6',
+        ),
+        yaxis=dict(
+            title='DO mg/L (일평균)',
+            title_font=dict(size=14),
+            tickfont=dict(size=12),
+            showgrid=True, gridcolor='#f3f4f6',
+        ),
+        legend=dict(
+            orientation='h', y=1.06, xanchor='right', x=1,
+            font=dict(size=13), bgcolor='rgba(255,255,255,0.85)',
+        ),
+    )
     st.plotly_chart(fig_s, use_container_width=True, config={'displaylogo': False})
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    c1, c2 = st.columns(2)
-    with c1:
-        st.metric("노량진 피어슨 상관계수 (r)", f"{corrs['노량진']:.3f}", "강한 양의 상관")
-    with c2:
-        st.metric("선유 피어슨 상관계수 (r)", f"{corrs['선유']:.3f}", "중간-강한 양의 상관")
+    # ── 상관계수 카드 ─────────────────────────────────────────────────────
+    m1, m2 = st.columns(2)
+    with m1:
+        st.metric(
+            label="노량진 피어슨 상관계수 (r)",
+            value=f"{corrs['노량진']:.3f}",
+            delta="강한 양의 상관관계",
+        )
+    with m2:
+        st.metric(
+            label="선유 피어슨 상관계수 (r)",
+            value=f"{corrs['선유']:.3f}",
+            delta="중간-강한 양의 상관관계",
+        )
 
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── 그래프 읽는 법 ────────────────────────────────────────────────────
+    st.markdown(
+        '<p style="font-size:16px; font-weight:700; color:#1e3a5f; margin-bottom:10px;">'
+        '📌 이 그래프를 읽는 방법</p>',
+        unsafe_allow_html=True,
+    )
     st.markdown("""
-    <div class="ins-card indigo">
-      <div class="ins-title">상관관계가 의미하는 것</div>
-      <div class="ins-body">
-        두 지표가 함께 오르내리는 이유는 <b>공통 생물학적 원인</b> 때문입니다.<br><br>
-        <b>봄 (3–4월):</b> 광합성 활발 → CO₂ 소비 → pH ↑ / O₂ 생산 → DO ↑<br>
-        <b>여름 (6–8월):</b> 유기물 분해 → CO₂ 방출 → pH ↓ / O₂ 소비 → DO ↓<br><br>
-        노량진(r=0.767)이 선유(r=0.648)보다 높은 이유는, 선유에서 퇴적물·유기물 등
-        국소 오염 인자가 DO를 추가로 낮춰 pH와의 연동을 희석시키기 때문입니다.
-      </div>
+    <div style="background:#eff6ff; border-left:4px solid #2563eb; border-radius:0 10px 10px 0;
+                padding:16px 20px; margin-bottom:16px; font-size:14px; line-height:1.85; color:#1e293b;">
+        <b>각 점(●) 하나 = 하루의 측정값</b><br>
+        x축(가로)은 그날의 pH 평균, y축(세로)은 DO 평균입니다.<br><br>
+        <b>추세선(점선)</b>은 전체 데이터의 경향을 한 줄로 요약한 것입니다.
+        추세선이 오른쪽 위를 향할수록 "pH가 높은 날은 DO도 높다"는 경향이 뚜렷하다는 뜻입니다.<br><br>
+        <b>상관계수 r</b>은 -1에서 +1 사이의 값입니다.
+        +1에 가까울수록 두 지표가 완벽하게 같이 움직이고, 0에 가까울수록 관련이 없습니다.
+        저희 데이터의 경우 노량진 0.767, 선유 0.648로 <b>두 지표가 꽤 강하게 연동</b>된다는 것을 보여줍니다.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── 상관관계가 의미하는 것 ────────────────────────────────────────────
+    st.markdown(
+        '<p style="font-size:16px; font-weight:700; color:#1e3a5f; margin-bottom:10px;">'
+        '🌊 이 상관관계가 의미하는 것</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown("""
+    <div style="background:#f0fdfa; border-left:4px solid #0891b2; border-radius:0 10px 10px 0;
+                padding:16px 20px; margin-bottom:14px; font-size:14px; line-height:1.9; color:#1e293b;">
+        pH와 DO는 서로 별개의 지표처럼 보이지만, 사실 <b>강 생태계의 생물학적 활동이라는 하나의 공통 원인</b>으로
+        함께 움직입니다.<br><br>
+        <b>🌸 봄 (3–4월) — pH ↑, DO ↑</b><br>
+        수온이 오르면 식물성 플랑크톤이 폭발적으로 증식하고 활발하게 광합성을 합니다.
+        광합성은 물속의 이산화탄소(CO₂)를 소비하는데, CO₂가 줄면 물이 알칼리성으로 변해 pH가 올라갑니다.
+        동시에 광합성의 산물로 산소(O₂)가 생성되므로 DO도 함께 올라갑니다.<br><br>
+        <b>☀️ 여름 (6–8월) — pH ↓, DO ↓</b><br>
+        봄에 번성했던 플랑크톤이 죽어 분해되면서 박테리아가 산소를 대량으로 소비합니다.
+        이 과정에서 CO₂가 다시 방출되어 pH가 낮아지고, 산소도 급격히 줄어 DO가 동반 하락합니다.
+        이것이 한강에서 여름철마다 DO 위기가 반복되는 핵심 이유입니다.<br><br>
+        <b>❄️ 겨울 (11–12월) — pH 안정, DO ↑</b><br>
+        수온이 낮아지면 생물 활동이 줄고, 차가운 물은 산소를 더 많이 녹일 수 있어 DO가 연중 최고치를 기록합니다.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── 두 지점 차이 설명 ────────────────────────────────────────────────
+    st.markdown("""
+    <div style="background:#fff7ed; border-left:4px solid #f97316; border-radius:0 10px 10px 0;
+                padding:16px 20px; font-size:14px; line-height:1.85; color:#1e293b;">
+        <b>📍 노량진(r=0.767)이 선유(r=0.648)보다 상관계수가 높은 이유</b><br><br>
+        선유는 한강 하류 방향으로 유속이 느리고 퇴적물·유기물이 더 많이 쌓이는 지점입니다.
+        퇴적 유기물은 플랑크톤 활동과는 별도로 DO를 추가로 낮추는 역할을 합니다.
+        즉 선유에서는 pH와 무관한 요인(퇴적물 분해)이 DO를 더 낮추기 때문에,
+        pH와 DO의 연동이 노량진만큼 깔끔하게 나타나지 않습니다.<br><br>
+        <b>결론:</b> 두 지점 모두 pH가 높은 날은 DO도 높고, pH가 낮은 날은 DO도 낮은 경향이 뚜렷합니다.
+        이 패턴을 이용하면 pH 데이터만으로도 DO 위험 상황을 어느 정도 예측할 수 있습니다.
     </div>
     """, unsafe_allow_html=True)
 
